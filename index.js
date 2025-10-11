@@ -222,6 +222,22 @@ app.delete("/admin/delete-user/:email", async (req, res) => {
     }
 })
 
+app.post("/admin/user-details", async (req,res) => {
+    const { email } = req.body;
+
+    if(!email){
+        return res.status(400).json({ message: "Cerendentials Missing"})
+    }
+
+    try{
+        const result = await pool.query(`SELECT id, email, password, preferred_lang, answers, total_marks FROM test_users WHERE email = $1`,[email]);
+        res.status(201).json(result);
+    }catch(err){
+        console.error("Error fetching users:", err);
+        res.status(500).json({ error: "Failed to fetch users" });
+    }
+})
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);
