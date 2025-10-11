@@ -2,7 +2,7 @@ CREATE TABLE test_users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
-    preferred_lang VARCHAR(20), -- selected dynamically on frontend
+    preferred_lang VARCHAR(20),
     questions JSONB NOT NULL DEFAULT '{}'::jsonb,
     answers JSONB DEFAULT '[]',
     total_marks INT DEFAULT 0,
@@ -11,6 +11,6 @@ CREATE TABLE test_users (
     is_tab_change BOOLEAN DEFAULT FALSE,
     is_end BOOLEAN DEFAULT FALSE,
     is_fullscreen_out BOOLEAN DEFAULT FALSE,
-    time VARCHAR(8) DEFAULT '00:00:00', -- store time as "HH:MM:SS"
+    time VARCHAR(8) DEFAULT '00:00:00',
     is_finish BOOLEAN DEFAULT FALSE
 );
