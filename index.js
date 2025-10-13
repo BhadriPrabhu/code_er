@@ -15,7 +15,7 @@ app.use(express.json());
 //   origin: allowedOrigins
 // }));
 
-app.use(cors({ origin: "*" }));
+app.use(cors());
 
 // app.use(
 //   cors({
@@ -45,9 +45,9 @@ pool.connect()
         console.error("Database connection failed:", err.message);
     });
 
-app.get("/", (req, res) => {
-    res.send("Backend running successfully 🚀");
-});
+// app.get("/", (req, res) => {
+//     res.send("Backend running successfully 🚀");
+// });
 
 // app.post("/api/register", async (req, res) => {
 //   const { email, password } = req.body;
