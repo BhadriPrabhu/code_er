@@ -15,7 +15,7 @@ app.use(express.json());
 //   origin: allowedOrigins
 // }));
 
-app.use(cors({ origin: "*"}));
+app.use(cors({ origin: "*" }));
 
 // app.use(
 //   cors({
@@ -35,6 +35,15 @@ app.use(cors({ origin: "*"}));
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 });
+
+pool.connect()
+    .then((client) => {
+        console.log("Database connected successfully!");
+        client.release();
+    })
+    .catch((err) => {
+        console.error("Database connection failed:", err.message);
+    });
 
 app.get("/", (req, res) => {
     res.send("Backend running successfully 🚀");
@@ -243,17 +252,17 @@ app.delete("/admin/delete-user/:email", async (req, res) => {
     }
 })
 
-app.post("/admin/user-details", async (req,res) => {
+app.post("/admin/user-details", async (req, res) => {
     const { email } = req.body;
 
-    if(!email){
-        return res.status(400).json({ message: "Cerendentials Missing"})
+    if (!email) {
+        return res.status(400).json({ message: "Cerendentials Missing" })
     }
 
-    try{
-        const result = await pool.query(`SELECT id, email, password, preferred_lang, answers, total_marks FROM test_users WHERE email = $1`,[email]);
+    try {
+        const result = await pool.query(`SELECT id, email, password, preferred_lang, answers, total_marks FROM test_users WHERE email = $1`, [email]);
         res.status(201).json(result);
-    }catch(err){
+    } catch (err) {
         console.error("Error fetching users:", err);
         res.status(500).json({ error: "Failed to fetch users" });
     }
