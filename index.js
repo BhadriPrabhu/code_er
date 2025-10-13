@@ -9,7 +9,26 @@ const { Pool } = pkg;
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'https://ieeehack.bitsathy.ac.in'];
+
+// app.use(cors({
+//   origin: allowedOrigins
+// }));
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -154,7 +173,7 @@ app.post("/api/isFinish", async (req, res) => {
             is_end,
             time,
             total_marks,
-            JSON.stringify(answers), // <-- important for JSONB
+            JSON.stringify(answers),
             email,
         ]);
 
@@ -168,7 +187,7 @@ app.post("/api/isFinish", async (req, res) => {
 app.get("/admin/users", async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, password, email, questions, total_marks, time, preferred_lang, is_tab_change, is_participate
+            `SELECT id, password, email, questions, total_marks, time, preferred_lang, is_tab_change, is_participate, user_role, is_fullscreen_out
        FROM test_users
        ORDER BY total_marks DESC`
         );
@@ -184,18 +203,18 @@ app.get("/admin/users", async (req, res) => {
 
 // POST add a new user
 app.post("/admin/add-user", async (req, res) => {
-    const { name, email, questions } = req.body;
+    const { name, email, questions, user_role } = req.body;
 
-    if (!name || !email || !questions) {
+    if (!name || !email || !questions || !user_role) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
         const result = await pool.query(
-            `INSERT INTO test_users (password, email, questions, total_marks, time)
-       VALUES ($1, $2, $3::jsonb, 0, '00:00:00')
+            `INSERT INTO test_users (password, email, questions, user_role, total_marks, time)
+       VALUES ($1, $2, $3::jsonb, $4, 0, '00:00:00')
        RETURNING id, password, email, questions`,
-            [name, email, JSON.stringify(questions)]
+            [name, email, JSON.stringify(questions), user_role]
         );
 
         res.status(201).json({ message: "User added successfully", user: result.rows[0] });
