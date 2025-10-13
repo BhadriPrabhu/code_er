@@ -1,0 +1,174 @@
+INSERT INTO test_users (email, password, questions)
+VALUES (
+  'bhadri@gmail.com',
+  '1234',
+  $json$
+  {
+    "C": [
+      {
+        "id": 1,
+        "title": "Pattern Printing",
+        "question": "#include <stdio.h>\nint main() {\n    int n = 5;\n    for(int i = n; i >= 0; i++) {\n        for(int j = 0; j <= i; j++)\n            printf(\"*\");\n        printf(\"\\n\");\n    }\n    return 0;\n}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint main() {\n    int n = 5;\n    for(int i = n; i > 0; i--) {\n        for(int j = 0; j < i; j++) printf(\"*\");\n        printf(\"\\n\");\n    }\n    return 0;\n}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){for(int i=5;i>=1;i--){for(int j=1;j<=i;j++)printf(\"*\");printf(\"\\n\");}return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 2,
+        "title": "Fibonacci Series",
+        "question": "#include <stdio.h>\nint main() {\n    int n1 = 0, n2 = 1, n3;\n    printf(\"%d %d\", n1, n2);\n    for(int i = 2; i <= 10; i++) {\n        n3 = n1 + n2;\n        printf(n3);\n        n1 = n2;\n        n2 = n3;\n    }\n    return 0;\n}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint main(){int a=0,b=1,c;printf(\"%d %d\",a,b);for(int i=2;i<10;i++){c=a+b;printf(\" %d\",c);a=b;b=c;}return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){int n1=0,n2=1,n3,i;printf(\"%d %d\",n1,n2);for(i=2;i<10;i++){n3=n1+n2;printf(\" %d\",n3);n1=n2;n2=n3;}return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 3,
+        "title": "Prime Number Check",
+        "question": "#include <stdio.h>\nint main() {\n    int n, i, flag = 0;\n    scanf(\"%d\", &n);\n    for(i = 2; i < n/2; i++) {\n        if(n % i == 0)\n            flag = 1;\n    }\n    if(flag = 0)\n        printf(\"Prime\");\n    else\n        printf(\"Not Prime\");\n    return 0;\n}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint main(){int n,i,flag=0;scanf(\"%d\",&n);for(i=2;i<=n/2;i++){if(n%i==0){flag=1;break;}}if(flag==0)printf(\"Prime\");else printf(\"Not Prime\");return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){int n,i,isPrime=1;scanf(\"%d\",&n);for(i=2;i*i<=n;i++){if(n%i==0){isPrime=0;break;}}printf(isPrime?\"Prime\":\"Not Prime\");return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 4,
+        "title": "String Reverse",
+        "question": "#include <stdio.h>\n#include <string.h>\nint main() {\n    char str[100];\n    gets(str);\n    for(int i = strlen(str); i >= 0; i--)\n        printf(str[i]);\n    return 0;\n}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\n#include <string.h>\nint main(){char s[100];scanf(\"%s\",s);for(int i=strlen(s)-1;i>=0;i--)printf(\"%c\",s[i]);return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\n#include <string.h>\nint main(){char s[100];gets(s);for(int i=strlen(s)-1;i>=0;i--)putchar(s[i]);return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 5,
+        "title": "Factorial using Recursion",
+        "question": "#include <stdio.h>\nint fact(int n){if(n==1)return 1;return n*fact(n-1);}int main(){int n=5;printf(fact(n));return 0;}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint fact(int n){if(n==0)return 1;return n*fact(n-1);}int main(){int n=5;printf(\"%d\",fact(n));return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint fact(int n){return (n==0)?1:n*fact(n-1);}int main(){printf(\"%d\",fact(5));return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 6,
+        "title": "Find Largest in Array",
+        "question": "#include <stdio.h>\nint main(){int arr[5]={3,7,2,9,4};int max=arr[0];for(int i=1;i<=5;i++)if(arr[i]>max)max=arr[i];printf(max);return 0;}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint main(){int arr[5]={3,7,2,9,4};int max=arr[0];for(int i=1;i<5;i++)if(arr[i]>max)max=arr[i];printf(\"%d\",max);return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){int arr[]={3,7,2,9,4};int max=arr[0];for(int i=1;i<5;i++){if(arr[i]>max)max=arr[i];}printf(\"Largest=%d\",max);return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 7,
+        "title": "Count Vowels in String",
+        "question": "#include <stdio.h>\n#include <ctype.h>\nint main(){char s[100];int count;gets(s);for(int i=0;s[i]!='\\0';i++){if(s[i]=='a'||s[i]=='e'||s[i]=='i'||s[i]=='o'||s[i]=='u')count++;}printf(\"%d\",count);return 0;}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\n#include <ctype.h>\nint main(){char s[100];int c=0;fgets(s,100,stdin);for(int i=0;s[i];i++){char ch=tolower(s[i]);if(ch=='a'||ch=='e'||ch=='i'||ch=='o'||ch=='u')c++;}printf(\"%d\",c);return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){char s[100];scanf(\"%s\",s);int v=0;for(int i=0;s[i];i++){if(strchr(\"aeiouAEIOU\",s[i]))v++;}printf(\"%d\",v);return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 8,
+        "title": "Multiplication Table",
+        "question": "#include <stdio.h>\nint main(){int i;for(i=1;i<10;i++)printf(\"5 x %d = %d\",i,5*i);return 0;}",
+        "evaluation_answers": [
+          {"id": 1, "answer": "#include <stdio.h>\nint main(){for(int i=1;i<=10;i++)printf(\"5 x %d = %d\\n\",i,5*i);return 0;}"},
+          {"id": 2, "answer": "#include <stdio.h>\nint main(){for(int i=1;i<=10;i++){printf(\"%d x 5 = %d\\n\",i,i*5);}return 0;}"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      }
+    ],
+
+    "Python": [
+      {
+        "id": 1,
+        "title": "Pattern Printing",
+        "question": "n = 5\nfor i in range(n, 0, -1)\n    print('*' * i)",
+        "evaluation_answers": [
+          {"id": 1, "answer": "n = 5\nfor i in range(n, 0, -1):\n    print('*' * i)"},
+          {"id": 2, "answer": "for i in range(5, 0, -1):\n    print('*' * i)"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 2,
+        "title": "Fibonacci Series",
+        "question": "a, b = 0, 1\nfor i in range(10)\nprint(a)\na, b = b, a + b",
+        "evaluation_answers": [
+          {"id": 1, "answer": "a,b=0,1\nfor i in range(10):\n    print(a)\n    a,b=b,a+b"},
+          {"id": 2, "answer": "a,b=0,1\nfor _ in range(10):\n    print(a)\n    a,b=b,a+b"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 3,
+        "title": "Prime Number Check",
+        "question": "n = input('Enter number: ')\nif n > 1:\n    for i in range(2, n):\n        if n % i == 0:\n            print('Not Prime')\n            break\n    else:\n        print('Prime')\nelse:\n    print('Not Prime')",
+        "evaluation_answers": [
+          {"id": 1, "answer": "n=int(input())\nif n>1:\n    for i in range(2,n):\n        if n%i==0:\n            print('Not Prime')\n            break\n    else:\n        print('Prime')\nelse:\n    print('Not Prime')"},
+          {"id": 2, "answer": "n=int(input('Enter:'))\nprint('Prime' if all(n%i for i in range(2,int(n**0.5)+1)) else 'Not Prime')"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 4,
+        "title": "String Reverse",
+        "question": "s = input()\nrev = ''\nfor ch in s\n    rev = ch + rev\nprint(rev)",
+        "evaluation_answers": [
+          {"id": 1, "answer": "s=input()\nrev=''\nfor ch in s:\n    rev=ch+rev\nprint(rev)"},
+          {"id": 2, "answer": "s=input()\nprint(s[::-1])"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 5,
+        "title": "Factorial using Recursion",
+        "question": "def fact(n):\n    if n = 0:\n        return 1\n    return n * fact(n - 1)\nprint(fact(5))",
+        "evaluation_answers": [
+          {"id": 1, "answer": "def fact(n):\n    if n==0:\n        return 1\n    return n*fact(n-1)\nprint(fact(5))"},
+          {"id": 2, "answer": "fact=lambda n:1 if n==0 else n*fact(n-1)\nprint(fact(5))"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 6,
+        "title": "Find Largest in List",
+        "question": "nums = [3,7,2,9,4]\nprint(max[num])",
+        "evaluation_answers": [
+          {"id": 1, "answer": "nums=[3,7,2,9,4]\nprint(max(nums))"},
+          {"id": 2, "answer": "nums=[3,7,2,9,4]\nm=nums[0]\nfor x in nums:\n    if x>m:m=x\nprint(m)"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 7,
+        "title": "Count Vowels in String",
+        "question": "s = input()\nvowels = 'aeiou'\ncount = 0\nfor c in s:\n    if c in vowels:\n        count + 1\nprint(count)",
+        "evaluation_answers": [
+          {"id": 1, "answer": "s=input().lower()\nv='aeiou'\nprint(sum(1 for c in s if c in v))"},
+          {"id": 2, "answer": "s=input().lower()\nvowels='aeiou'\ncount=0\nfor c in s:\n    if c in vowels:count+=1\nprint(count)"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      },
+      {
+        "id": 8,
+        "title": "Multiplication Table",
+        "question": "for i in range(1, 10):\nprint(f'5 x {i} = {5 * i}')",
+        "evaluation_answers": [
+          {"id": 1, "answer": "for i in range(1,11):\n    print(f'5 x {i} = {5*i}')"},
+          {"id": 2, "answer": "for i in range(1,11):print('5 x',i,'=',5*i)"}
+        ],
+        "score": 0, "user_answer": null, "isSubmit": false
+      }
+    ]
+  }
+  $json$::jsonb
+);
