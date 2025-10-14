@@ -184,7 +184,7 @@ const AdminDashboard = () => {
   const handleView = (email) => {
     setIsOpen(true);
     api.post("/admin/user-details", { email })
-      .then((res) => setViewData(res.data.rows[0]))
+      .then((res) => {setViewData(res.data)})
       .catch((err) => console.error("Failed to fetch details:", err));
   };
 

@@ -233,9 +233,6 @@ export default function CodingTestPage() {
       <div className="w-full md:w-1/2 p-4 sm:p-6 sm:pt-20 md:p-8 md:pt-20 lg:p-10 lg:pt-20 pt-20 bg-[#0A1224]/90 border-b md:border-b-0 md:border-r border-cyan-500/20">
         <h2 className="text-xl sm:text-2xl font-bold text-cyan-400 mb-3">Debug Task {currentQ + 1}</h2>
         <p className="text-gray-300 text-sm sm:text-base mb-2">{currentQuestion.title}</p>
-        <p className="text-gray-400 text-xs sm:text-sm italic mb-4">
-          (This code contains an intentional error. Identify and correct it.)
-        </p>
 
         <div className="rounded-lg overflow-hidden border border-cyan-500/30 bg-[#0E1B33]">
           <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/20 px-3 py-2 border-b border-cyan-500/20 text-xs sm:text-sm font-semibold text-cyan-300">

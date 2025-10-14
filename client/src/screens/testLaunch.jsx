@@ -19,7 +19,7 @@ export default function TestLaunch() {
   const [isParticipate, setIsParticipate] = useState(false);
 
   const testStartTime = new Date("2025-10-08T17:00:00");
-  const testEndTime = new Date("2025-10-14T20:00:00");
+  const testEndTime = new Date("2025-10-15T20:00:00");
   const [timeLeft, setTimeLeft] = useState(() => {
     const now = new Date();
     if (now < testStartTime) return 0;
