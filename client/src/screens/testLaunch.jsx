@@ -67,7 +67,7 @@ export default function TestLaunch() {
       preferred_lang: preferredLang,
       is_participate: true,
     };
-    api.post(`${import.meta.env.VITE_API}/api/test`, body)
+    api.post("/api/test", body)
       .then((e) => {
         const result = e.data.message.rows?.[0]?.["?column?"] || [];
         const item = e.data.res || {};

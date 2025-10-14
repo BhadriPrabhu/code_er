@@ -25,9 +25,9 @@ export default function Login() {
       return;
     }
     const body = { email: auth.email, password: auth.password };
-    api.post(`${import.meta.env.VITE_API}/api/login`, body)
+    api.post("/api/login", body)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
         const role = res.data.role; // get role string
         setRole(role);
         const item = res.data.isParticipate;

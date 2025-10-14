@@ -47,7 +47,7 @@ export default function CodingTestPage() {
       if (!tabChangedRef.current) {
         tabChangedRef.current = true;
         alert("Tab switch or app switch detected! Test terminated.");
-      api.post(`${import.meta.env.VITE_API}/api/istab`, { email, is_tab_change: true, is_end: true })
+      api.post("/api/istab", { email, is_tab_change: true, is_end: true })
           .catch((err) => console.error(err));
         endTest();
       }
@@ -57,7 +57,7 @@ export default function CodingTestPage() {
       if (isEndingRef.current) return;
       if (!document.fullscreenElement) {
         alert("Exited fullscreen! Test terminated.");
-        api.post(`${import.meta.env.VITE_API}/api/isfull`, { email, is_fullscreen_out: true, is_end: true })
+        api.post("/api/isfull", { email, is_fullscreen_out: true, is_end: true })
           .catch((err) => console.error(err));
         endTest();
       }
@@ -165,7 +165,7 @@ export default function CodingTestPage() {
       setCode("");
     } else {
       setSubmitOver(true);
-      console.log(`✅ Test Completed! Total Score: ${score + earned}`);
+      // console.log(`✅ Test Completed! Total Score: ${score + earned}`);
     }
   };
 
@@ -192,7 +192,7 @@ export default function CodingTestPage() {
       answers,
     };
 
-    api.post(`${import.meta.env.VITE_API}/api/isFinish`, body)
+    api.post("/api/isFinish", body)
       .then((res) => console.log("Submitted successfully", res.data))
       .catch((err) => console.error(err));
 
