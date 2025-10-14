@@ -173,7 +173,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (email) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await api.delete("/admin/delete-user/${email}");
+      await api.delete(`/admin/delete-user/${email}`);
       fetchUsers();
     } catch (err) {
       console.error("Error deleting user:", err);

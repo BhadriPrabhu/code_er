@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
-import jwt from "jsonwebtoken";
+
+
 
 dotenv.config();
 const { Pool } = pkg;
@@ -261,12 +262,39 @@ app.post("/admin/user-details", async (req, res) => {
 
     try {
         const result = await pool.query(`SELECT id, email, password, preferred_lang, answers, total_marks FROM test_users WHERE email = $1`, [email]);
-        res.status(201).json(result);
+        res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error("Error fetching users:", err);
         res.status(500).json({ error: "Failed to fetch users" });
     }
 })
+
+
+app.post("/admin/bulk-add-users", async (req, res) => {
+  const { users } = req.body;
+
+  if (!users || !Array.isArray(users) || users.length === 0) {
+    return res.status(400).json({ message: "No users provided" });
+  }
+
+  try {
+    for (const user of users) {
+      const { name, email, questions, user_role } = user;
+      if (!name || !email || !questions || !user_role) continue;
+
+      await pool.query(
+        `INSERT INTO test_users (password, email, questions, user_role, total_marks, time)
+         VALUES ($1, $2, $3::jsonb, $4, 0, '00:00:00')`,
+        [name, email, JSON.stringify(questions), user_role]
+      );
+    }
+
+    res.status(201).json({ message: "Users uploaded successfully", count: users.length });
+  } catch (err) {
+    console.error("Error uploading users:", err);
+    res.status(500).json({ error: "Failed to upload users" });
+  }
+});
 
 
 app.listen(process.env.PORT, () => {
