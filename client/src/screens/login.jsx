@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import axios from "axios";
 import useUserStore from "../store/store";
+import api from "../api/api";
 
 
 export default function Login() {
@@ -25,8 +25,7 @@ export default function Login() {
       return;
     }
     const body = { email: auth.email, password: auth.password };
-    axios
-      .post(`${import.meta.env.VITE_API}/api/login`, body)
+    api.post(`${import.meta.env.VITE_API}/api/login`, body)
       .then((res) => {
         console.log(res)
         const role = res.data.role; // get role string

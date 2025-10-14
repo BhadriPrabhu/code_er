@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import useUserStore from "../store/store";
-import axios from "axios";
+import api from "../api/api";
 import { useState, useCallback, useEffect } from "react";
 
 export default function TestLaunch() {
@@ -67,8 +67,7 @@ export default function TestLaunch() {
       preferred_lang: preferredLang,
       is_participate: true,
     };
-    axios
-      .post(`${import.meta.env.VITE_API}/api/test`, body)
+    api.post(`${import.meta.env.VITE_API}/api/test`, body)
       .then((e) => {
         const result = e.data.message.rows?.[0]?.["?column?"] || [];
         const item = e.data.res || {};

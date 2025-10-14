@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
 import * as XLSX from "xlsx";
 import useUserStore from "../store/store";
 
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
   // Fetch all users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API}/admin/users`);
+      const res = await api.get(`${import.meta.env.VITE_API}/admin/users`);
       setUsers(res.data);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
     };
 
     try {
-      await axios.post(`${import.meta.env.VITE_API}/admin/add-user`, body);
+      await api.post(`${import.meta.env.VITE_API}/admin/add-user`, body);
       setMessage("✅ User added successfully!");
       setForm({ name: "", email: "", questionSet: "", userRole: false });
       fetchUsers();
@@ -132,7 +132,7 @@ const AdminDashboard = () => {
         })),
       };
 
-      await axios.post(`${import.meta.env.VITE_API}/admin/bulk-add-users`, body);
+      await api.post(`${import.meta.env.VITE_API}/admin/bulk-add-users`, body);
       alert("✅ Bulk upload successful!");
       setExcelUsers([]);
       fetchUsers();
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (email) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API}/admin/delete-user/${email}`);
+      await api.delete(`${import.meta.env.VITE_API}/admin/delete-user/${email}`);
       fetchUsers();
     } catch (err) {
       console.error("Error deleting user:", err);
@@ -183,8 +183,7 @@ const AdminDashboard = () => {
   // 🔹 View user details
   const handleView = (email) => {
     setIsOpen(true);
-    axios
-      .post(`${import.meta.env.VITE_API}/admin/user-details`, { email })
+    api.post(`${import.meta.env.VITE_API}/admin/user-details`, { email })
       .then((res) => setViewData(res.data.rows[0]))
       .catch((err) => console.error("Failed to fetch details:", err));
   };

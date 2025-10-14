@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import useUserStore from "../store/store";
 import { useNavigate } from "react-router";
-import axios from "axios";
+import api from "../api/api";
 
 export default function CodingTestPage() {
   const questions = useUserStore((state) => state.questions);
@@ -47,8 +47,7 @@ export default function CodingTestPage() {
       if (!tabChangedRef.current) {
         tabChangedRef.current = true;
         alert("Tab switch or app switch detected! Test terminated.");
-        axios
-          .post(`${import.meta.env.VITE_API}/api/istab`, { email, is_tab_change: true, is_end: true })
+      api.post(`${import.meta.env.VITE_API}/api/istab`, { email, is_tab_change: true, is_end: true })
           .catch((err) => console.error(err));
         endTest();
       }
@@ -58,8 +57,7 @@ export default function CodingTestPage() {
       if (isEndingRef.current) return;
       if (!document.fullscreenElement) {
         alert("Exited fullscreen! Test terminated.");
-        axios
-          .post(`${import.meta.env.VITE_API}/api/isfull`, { email, is_fullscreen_out: true, is_end: true })
+        api.post(`${import.meta.env.VITE_API}/api/isfull`, { email, is_fullscreen_out: true, is_end: true })
           .catch((err) => console.error(err));
         endTest();
       }
@@ -194,8 +192,7 @@ export default function CodingTestPage() {
       answers,
     };
 
-    axios
-      .post(`${import.meta.env.VITE_API}/api/isFinish`, body)
+    api.post(`${import.meta.env.VITE_API}/api/isFinish`, body)
       .then((res) => console.log("Submitted successfully", res.data))
       .catch((err) => console.error(err));
 
