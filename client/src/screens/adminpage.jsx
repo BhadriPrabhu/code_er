@@ -238,10 +238,10 @@ const AdminDashboard = () => {
       await api.put("/admin/update-user", body);
       setEditModal(false);
       fetchUsers();
-      alert("✅ User updated successfully!");
+      alert("User updated successfully!");
     } catch (err) {
       console.error("Error updating user:", err);
-      alert("❌ Failed to update user!");
+      alert("Failed to update user!");
     } finally {
       setViewData({});
     }
