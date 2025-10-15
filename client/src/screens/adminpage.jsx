@@ -13,10 +13,14 @@ const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewData, setViewData] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [editModal, setEditModal] = useState(false);
+  const [editData, setEditData] = useState({ name: "", email: "", total_marks: 0 });
+
 
   const logout = useUserStore((state) => state.logout);
   const setParticipate = useUserStore((state) => state.setParticipate);
   const setAttended = useUserStore((state) => state.setAttended);
+
 
   // Static mapping for question sets
   const questionSetMap = {
@@ -132,7 +136,7 @@ const AdminDashboard = () => {
         })),
       };
 
-      await api.post(`admin/bulk-add-users`, body);
+      await api.post(`/admin/bulk-add-users`, body);
       alert("✅ Bulk upload successful!");
       setExcelUsers([]);
       fetchUsers();
@@ -184,7 +188,7 @@ const AdminDashboard = () => {
   const handleView = (email) => {
     setIsOpen(true);
     api.post("/admin/user-details", { email })
-      .then((res) => {setViewData(res.data)})
+      .then((res) => { setViewData(res.data) })
       .catch((err) => console.error("Failed to fetch details:", err));
   };
 
@@ -196,6 +200,61 @@ const AdminDashboard = () => {
     setAttended(false);
     window.location.href = "/";
   };
+
+  const openEditModal = (user) => {
+    api.post("/admin/user-details", { email: user.email })
+      .then((res) => {
+        setViewData(res.data)
+      })
+      .catch((err) => console.error("Failed to fetch details:", err));
+    setEditData({
+      name: user.password,
+      email: user.email,
+      total_marks: user.total_marks || 0,
+    });
+    setEditModal(true);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+
+      const total = (viewData.answers || []).reduce(
+        (sum, ans) => sum + (Number(ans.earnedMarks) || 0),
+        0
+      );
+
+      const body = {
+        email: viewData.email,
+        newName: editData.name,
+        newEmail: editData.email,
+        total_marks: total,
+        answers: viewData.answers
+      }
+
+      await api.put("/admin/update-user", body);
+      setEditModal(false);
+      fetchUsers();
+      alert("✅ User updated successfully!");
+    } catch (err) {
+      console.error("Error updating user:", err);
+      alert("❌ Failed to update user!");
+    } finally {
+      setViewData({});
+    }
+  };
+
+  const updateAnswerMarks = (index, newMark) => {
+    setViewData((prev) => {
+      const updated = [...(prev.answers || [])];
+      updated[index] = { ...updated[index], earnedMarks: Number(newMark) || 0 };
+      return { ...prev, answers: updated };
+    });
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -277,6 +336,130 @@ const AdminDashboard = () => {
       </div>
 
 
+      {editModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setEditModal(false)}
+        >
+          <div
+            className="bg-white text-black rounded-xl shadow-xl w-11/12 sm:w-1/2 p-6 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setEditModal(false)
+                setViewData({});
+              }}
+              className="absolute top-3 right-4 text-gray-500 text-2xl"
+            >
+              &times;
+            </button>
+
+            <h2 className="text-xl font-bold mb-4 text-center text-blue-700">
+              Edit User Details
+            </h2>
+
+            <div className="flex flex-col gap-3">
+              <label>
+                Name:
+                <input
+                  type="text"
+                  value={editData.name}
+                  onChange={(e) => handleEditChange("name", e.target.value)}
+                  className="p-2 border rounded w-full"
+                />
+              </label>
+              <label>
+                Email:
+                <input
+                  type="email"
+                  value={editData.email}
+                  onChange={(e) => handleEditChange("email", e.target.value)}
+                  className="p-2 border rounded w-full"
+                />
+              </label>
+              <label>
+                Total Marks:
+                <input
+                  type="number"
+                  value={editData.total_marks}
+                  onChange={(e) => handleEditChange("total_marks", e.target.value)}
+                  className="p-2 border rounded w-full"
+                />
+              </label>
+            </div>
+
+            {/* Individual Question Marks Section */}
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-blue-700 mb-3">Individual Question Marks</h3>
+
+              {viewData?.answers?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-64 overflow-y-auto pr-2">
+                  {viewData.answers.map((ans, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-gray-100 p-3 rounded-lg shadow hover:shadow-md transition border border-gray-200"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-gray-800">
+                          Q{ans.questionId || idx + 1}
+                        </span>
+                        <span
+                          className={`px-2 py-1 text-xs font-semibold rounded ${ans.earnedMarks === 0
+                            ? "bg-red-100 text-red-700"
+                            : ans.earnedMarks >= 8
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                            }`}
+                        >
+                          {ans.earnedMarks} marks
+                        </span>
+                      </div>
+
+                      {/* Editable Marks Input */}
+                      <input
+                        type="number"
+                        value={ans.earnedMarks || ""}
+                        onChange={(e) => updateAnswerMarks(idx, e.target.value)}
+                        className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"
+                        min="0"
+                        max="10"
+                      />
+
+                      {/* Optional: Show user’s code */}
+                      {ans.userAnswer && (
+                        <details className="mt-2 text-sm">
+                          <summary className="cursor-pointer text-blue-600 hover:underline">
+                            View Answer
+                          </summary>
+                          <pre className="bg-gray-900 text-gray-100 p-2 rounded-md mt-1 overflow-x-auto text-xs">
+                            {ans.userAnswer}
+                          </pre>
+                        </details>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 italic">No answers found for this user.</p>
+              )}
+            </div>
+
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleSaveEdit}
+                className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
@@ -289,7 +472,10 @@ const AdminDashboard = () => {
           >
             {/* Close Button */}
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false)
+                setViewData({});
+              }}
               className="absolute top-3 right-4 text-gray-600 hover:text-black text-2xl"
             >
               &times;
@@ -356,7 +542,10 @@ const AdminDashboard = () => {
             {/* Footer */}
             <div className="mt-6 text-center">
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                  setViewData({});
+                }}
                 className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
               >
                 Close
@@ -414,6 +603,12 @@ const AdminDashboard = () => {
                     className="bg-blue-600 px-3 py-1 rounded hover:bg-blue-700"
                   >
                     View
+                  </button>
+                  <button
+                    onClick={() => openEditModal(user)}
+                    className="bg-yellow-600 px-3 py-1 rounded hover:bg-yellow-700"
+                  >
+                    Score
                   </button>
                   <button
                     onClick={() => handleDeleteUser(user.email)}

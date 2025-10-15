@@ -271,30 +271,55 @@ app.post("/admin/user-details", async (req, res) => {
 
 
 app.post("/admin/bulk-add-users", async (req, res) => {
-  const { users } = req.body;
+    const { users } = req.body;
 
-  if (!users || !Array.isArray(users) || users.length === 0) {
-    return res.status(400).json({ message: "No users provided" });
-  }
-
-  try {
-    for (const user of users) {
-      const { name, email, questions, user_role } = user;
-      if (!name || !email || !questions || !user_role) continue;
-
-      await pool.query(
-        `INSERT INTO test_users (password, email, questions, user_role, total_marks, time)
-         VALUES ($1, $2, $3::jsonb, $4, 0, '00:00:00')`,
-        [name, email, JSON.stringify(questions), user_role]
-      );
+    if (!users || !Array.isArray(users) || users.length === 0) {
+        return res.status(400).json({ message: "No users provided" });
     }
 
-    res.status(201).json({ message: "Users uploaded successfully", count: users.length });
-  } catch (err) {
-    console.error("Error uploading users:", err);
-    res.status(500).json({ error: "Failed to upload users" });
-  }
+    try {
+        for (const user of users) {
+            const { name, email, questions, user_role } = user;
+            if (!name || !email || !questions || !user_role) continue;
+
+            await pool.query(
+                `INSERT INTO test_users (password, email, questions, user_role, total_marks, time)
+         VALUES ($1, $2, $3::jsonb, $4, 0, '00:00:00')`,
+                [name, email, JSON.stringify(questions), user_role]
+            );
+        }
+
+        res.status(201).json({ message: "Users uploaded successfully", count: users.length });
+    } catch (err) {
+        console.error("Error uploading users:", err);
+        res.status(500).json({ error: "Failed to upload users" });
+    }
 });
+
+app.put("/admin/update-user", async (req, res) => {
+    const { email, newName, newEmail, total_marks, answers } = req.body;
+
+    if (!email) return res.status(400).json({ error: "Missing Ceredentials" });
+
+    try {
+        const result = await pool.query(
+            `UPDATE test_users 
+       SET total_marks = $1, password = $2, email = $3, answers = $4
+       WHERE email = $5
+       RETURNING email, total_marks`,
+            [total_marks, newName, newEmail, JSON.stringify(answers), email]
+        );
+
+        if (result.rowCount === 0)
+            return res.status(404).json({ error: "User not found" });
+
+        res.json({ message: "Marks updated successfully!", user: result.rows[0] });
+    } catch (error) {
+        console.error("Error updating marks:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 
 
 app.listen(process.env.PORT, () => {
