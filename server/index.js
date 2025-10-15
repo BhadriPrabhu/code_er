@@ -2,9 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
-import ExcelJS from "exceljs";
-import fs from "fs";
-import path from "path";
 
 
 
@@ -324,45 +321,15 @@ app.put("/admin/update-user", async (req, res) => {
 });
 
 
-app.get("api/admin/download-data", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM test_users ORDER BY total_marks DESC");
-
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Leaderboard");
-
-    // Add headers
-    worksheet.columns = [
-      { header: "ID", key: "id", width: 10 },
-      { header: "Name", key: "name", width: 25 },
-      { header: "Email", key: "email", width: 30 },
-      { header: "Total Marks", key: "total_marks", width: 15 },
-      { header: "Timing", key: "timing", width: 15 },
-      { header: "Question Set", key: "question_set", width: 15 },
-    ];
-
-    // Add rows
-    result.rows.forEach((row) => {
-      worksheet.addRow(row);
-    });
-
-    // Auto style header
-    worksheet.getRow(1).font = { bold: true };
-
-    // Save temporarily
-    const filePath = path.join("/tmp", "leaderboard.xlsx");
-    await workbook.xlsx.writeFile(filePath);
-
-    res.download(filePath, "leaderboard.xlsx", (err) => {
-      if (err) console.error(err);
-      fs.unlinkSync(filePath); // cleanup after download
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error generating Excel");
-  }
+app.get("/admin/user-details-download", async (req, res) => {
+    try {
+        const result = await pool.query(`SELECT * FROM test_users ORDER BY total_marks DESC`);
+        res.json(result.rows);
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        res.status(500).json({ error: "Failed to fetch users" });
+    }
 });
-
 
 
 app.listen(process.env.PORT, () => {

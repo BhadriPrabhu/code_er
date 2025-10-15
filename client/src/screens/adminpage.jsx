@@ -255,6 +255,43 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleDownloadUser = async () => {
+    try {
+      const res = await api.get("/admin/user-details-download");
+      const allUsers = res.data;
+
+      if (!allUsers || allUsers.length === 0) {
+        alert("No data found to export!");
+        return;
+      }
+
+      // Convert JSON to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(
+        allUsers.map((u, i) => ({
+          Rank: i + 1,
+          Name: u.password,
+          Email: u.email,
+          Preferred_Language: u.preferred_lang || "-",
+          Total_Marks: u.total_marks ?? 0,
+          Time_Taken: u.time ?? "-",
+          Participated: u.is_participate ? "Yes" : "No",
+          Tab_Changed: u.is_tab_change ? "Yes" : "No",
+          Fullscreen_Out: u.is_fullscreen_out ? "Yes" : "No",
+          Role: u.user_role,
+        }))
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+      XLSX.writeFile(workbook, "Code_ER_User_Data.xlsx");
+
+    } catch (err) {
+      console.error("Error downloading Excel:", err);
+      alert("Failed to fetch data from backend!");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -336,10 +373,7 @@ const AdminDashboard = () => {
       </div>
       <div className="mx-auto mb-6 max-w-xl flex justify-center">
         <button
-          onClick={() => {
-            const baseURL = api.defaults.baseURL;
-            window.open(`${baseURL}/api/admin/download-data`, "_blank");
-          }}
+          onClick={handleDownloadUser}
           className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
         >
           Download Excel
