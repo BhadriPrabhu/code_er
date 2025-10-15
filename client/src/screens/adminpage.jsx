@@ -338,7 +338,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => {
             const baseURL = api.defaults.baseURL;
-            window.open(`${baseURL}/admin/download-data`, "_blank");
+            window.open(`${baseURL}/api/admin/download-data`, "_blank");
           }}
           className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
         >
