@@ -668,6 +668,7 @@ const AdminDashboard = () => {
 
         {/* Pagination */}
         <div className="flex justify-center mt-4 gap-2 overflow-y-auto">
+          {/* Previous Button */}
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
@@ -675,16 +676,60 @@ const AdminDashboard = () => {
           >
             Prev
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 rounded ${page === currentPage ? "bg-cyan-600" : "bg-gray-700"
-                }`}
-            >
-              {page}
-            </button>
-          ))}
+
+          {/* Page Numbers */}
+          {(() => {
+            const pages = [];
+            const totalVisible = 5; // Number of page buttons visible around current page
+
+            const start = Math.max(1, currentPage - Math.floor(totalVisible / 2));
+            const end = Math.min(totalPages, start + totalVisible - 1);
+
+            // Always show first page
+            if (start > 1) {
+              pages.push(
+                <button
+                  key={1}
+                  onClick={() => setCurrentPage(1)}
+                  className={`px-3 py-1 rounded ${currentPage === 1 ? "bg-cyan-600" : "bg-gray-700"}`}
+                >
+                  1
+                </button>
+              );
+              if (start > 2) pages.push(<span key="dots-start">...</span>);
+            }
+
+            // Visible middle pages
+            for (let i = start; i <= end; i++) {
+              pages.push(
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i)}
+                  className={`px-3 py-1 rounded ${i === currentPage ? "bg-cyan-600" : "bg-gray-700"}`}
+                >
+                  {i}
+                </button>
+              );
+            }
+
+            // Always show last page
+            if (end < totalPages) {
+              if (end < totalPages - 1) pages.push(<span key="dots-end">...</span>);
+              pages.push(
+                <button
+                  key={totalPages}
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`px-3 py-1 rounded ${currentPage === totalPages ? "bg-cyan-600" : "bg-gray-700"}`}
+                >
+                  {totalPages}
+                </button>
+              );
+            }
+
+            return pages;
+          })()}
+
+          {/* Next Button */}
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
@@ -693,6 +738,7 @@ const AdminDashboard = () => {
             Next
           </button>
         </div>
+
       </div>
     </div>
   );
