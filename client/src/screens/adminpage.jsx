@@ -310,7 +310,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Bulk Upload */}
-      <div className="bg-gray-800 p-6 rounded-lg mb-10 max-w-xl mx-auto shadow-lg">
+      <div className="bg-gray-800 p-6 rounded-lg mb-6 max-w-xl mx-auto shadow-lg">
         <h2 className="text-xl mb-4 font-semibold text-center">Bulk Upload Users</h2>
         <input
           type="file"
@@ -334,7 +334,17 @@ const AdminDashboard = () => {
           Upload {excelUsers.length} Users
         </button>
       </div>
-
+      <div className="mx-auto mb-6 max-w-xl flex justify-center">
+        <button
+          onClick={() => {
+            const baseURL = api.defaults.baseURL;
+            window.open(`${baseURL}/admin/download-data`, "_blank");
+          }}
+          className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+        >
+          Download Excel
+        </button>
+      </div>
 
       {editModal && (
         <div
@@ -623,7 +633,7 @@ const AdminDashboard = () => {
         </table>
 
         {/* Pagination */}
-        <div className="flex justify-center mt-4 gap-2">
+        <div className="flex justify-center mt-4 gap-2 overflow-y-auto">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
