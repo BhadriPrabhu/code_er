@@ -257,7 +257,7 @@ const AdminDashboard = () => {
 
   const handleDownloadUser = async () => {
     try {
-      const res = await api.get("/admin/user-details-download");
+      const res = await api.get("/admin/user-download");
       const allUsers = res.data;
 
       if (!allUsers || allUsers.length === 0) {

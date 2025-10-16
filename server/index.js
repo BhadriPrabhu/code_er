@@ -321,7 +321,7 @@ app.put("/admin/update-user", async (req, res) => {
 });
 
 
-app.get("/admin/user-details-download", async (req, res) => {
+app.get("/admin/user-download", async (req, res) => {
     try {
         const result = await pool.query(`SELECT * FROM test_users ORDER BY total_marks DESC`);
 
