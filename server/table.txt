@@ -3,7 +3,6 @@ test_users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     preferred_lang VARCHAR(20),
-    questions JSONB NOT NULL DEFAULT '{}'::jsonb,
     answers JSONB DEFAULT '[]',
     total_marks INT DEFAULT 0,
     role BOOLEAN DEFAULT FALSE,
@@ -13,7 +12,8 @@ test_users (
     is_fullscreen_out BOOLEAN DEFAULT FALSE,
     time VARCHAR(8) DEFAULT '00:00:00',
     is_finish BOOLEAN DEFAULT FALSE,
-    user_role VARCHAR(10) DEFAULT 'user'
+    user_role VARCHAR(10) DEFAULT 'user',
+    assigned_set_id INT REFERENCES question_sets(id)
 );
 
 

@@ -207,7 +207,7 @@ app.post("/api/isFinish", async (req, res) => {
 app.get("/admin/users", async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, password, email, questions, total_marks, time, preferred_lang, is_tab_change, is_participate, user_role, is_fullscreen_out
+            `SELECT id, password, email, answers, total_marks, time, preferred_lang, is_tab_change, is_participate, user_role, is_fullscreen_out
        FROM test_users
        ORDER BY total_marks DESC`
         );
@@ -280,7 +280,8 @@ app.post("/admin/user-details", async (req, res) => {
 
 
 app.post("/admin/bulk-add-users", async (req, res) => {
-    const { users } = req.body;
+    // Note: The frontend must send 'setId' instead of a raw 'questions' array.
+    const { users, setId } = req.body; 
 
     if (!users || !Array.isArray(users) || users.length === 0) {
         return res.status(400).json({ message: "No users provided" });
@@ -288,13 +289,14 @@ app.post("/admin/bulk-add-users", async (req, res) => {
 
     try {
         for (const user of users) {
-            const { name, email, questions, user_role } = user;
-            if (!name || !email || !questions || !user_role) continue;
+            const { name, email, user_role } = user;
+            if (!name || !email || !user_role) continue;
 
+            // Updated to use assigned_set_id instead of questions
             await pool.query(
-                `INSERT INTO test_users (password, email, questions, user_role, total_marks, time)
-         VALUES ($1, $2, $3::jsonb, $4, 0, '00:00:00')`,
-                [name, email, JSON.stringify(questions), user_role]
+                `INSERT INTO test_users (password, email, assigned_set_id, user_role, total_marks, time)
+                 VALUES ($1, $2, $3, $4, 0, '00:00:00')`,
+                [name, email, setId, user_role]
             );
         }
 
