@@ -207,7 +207,7 @@ app.post("/api/isFinish", async (req, res) => {
 app.get("/admin/users", async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, password, email, answers, total_marks, time, preferred_lang, is_tab_change, is_participate, user_role, is_fullscreen_out
+            `SELECT id, password, email, answers, total_marks, time, preferred_lang, is_tab_change, is_participate, user_role, is_fullscreen_out, assigned_set_id
        FROM test_users
        ORDER BY total_marks DESC`
         );

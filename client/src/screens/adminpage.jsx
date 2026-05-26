@@ -689,6 +689,7 @@ const AdminDashboard = () => {
               <th className="p-3">Name</th>
               <th className="p-3">Email</th>
               <th className="p-3">Preferred Lang</th>
+              <th className="p-3">Assigned Set</th>
               <th className="p-3">Total Marks</th>
               <th className="p-3">Time Taken</th>
               <th className="p-3">Participated</th>
@@ -705,6 +706,7 @@ const AdminDashboard = () => {
                 <td className="p-3">{user.password}</td>
                 <td className="p-3">{user.email}</td>
                 <td className="p-3">{user.preferred_lang}</td>
+                <td className="p-3">{user.assigned_set_id}</td>
                 <td className="p-3">{user.total_marks ?? 0}</td>
                 <td className="p-3">{user.time ?? "-"}</td>
                 <td className="p-3">{user.is_participate ? "Yes" : "No"}</td>
