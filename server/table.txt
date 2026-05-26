@@ -1,0 +1,38 @@
+test_users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    preferred_lang VARCHAR(20),
+    questions JSONB NOT NULL DEFAULT '{}'::jsonb,
+    answers JSONB DEFAULT '[]',
+    total_marks INT DEFAULT 0,
+    role BOOLEAN DEFAULT FALSE,
+    is_participate BOOLEAN DEFAULT FALSE,
+    is_tab_change BOOLEAN DEFAULT FALSE,
+    is_end BOOLEAN DEFAULT FALSE,
+    is_fullscreen_out BOOLEAN DEFAULT FALSE,
+    time VARCHAR(8) DEFAULT '00:00:00',
+    is_finish BOOLEAN DEFAULT FALSE,
+    user_role VARCHAR(10) DEFAULT 'user'
+);
+
+
+question_sets (
+    id SERIAL PRIMARY KEY,
+    set_key VARCHAR(50) UNIQUE NOT NULL, -- e.g., 'questionSet1', 'questionSet2'
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
+test_questions (
+    id SERIAL PRIMARY KEY,
+    set_id INT REFERENCES question_sets(id) ON DELETE CASCADE,
+    language VARCHAR(20) NOT NULL,       -- 'C' or 'Python'
+    question_index INT NOT NULL,         -- Sequential order (1, 2, 3...)
+    title VARCHAR(255) NOT NULL,         -- e.g., 'Pattern Printing'
+    buggy_code TEXT NOT NULL,            -- The broken code snippet
+    expected_output TEXT NOT NULL,       -- What the corrected code should print
+    evaluation_answers JSONB NOT NULL DEFAULT '[]'::jsonb, -- Strict exact matching array
+    UNIQUE(set_id, language, question_index)
+);
