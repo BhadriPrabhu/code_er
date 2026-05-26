@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api/api";
 import * as XLSX from "xlsx";
 import useUserStore from "../store/store";
+import QuestionManager from "../components/questionManager";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -78,7 +79,7 @@ const AdminDashboard = () => {
 
     const questions = await loadQuestionSet(form.questionSet);
     if (!questions) {
-      setMessage("❌ Failed to load questions!");
+      setMessage(" Failed to load questions!");
       return;
     }
 
@@ -91,12 +92,12 @@ const AdminDashboard = () => {
 
     try {
       await api.post("/admin/add-user", body);
-      setMessage("✅ User added successfully!");
+      setMessage(" User added successfully!");
       setForm({ name: "", email: "", questionSet: "", userRole: false });
       fetchUsers();
     } catch (err) {
       console.error("Error adding user:", err);
-      setMessage("❌ Failed to add user!");
+      setMessage("Failed to add user!");
     }
   };
 
@@ -137,7 +138,7 @@ const AdminDashboard = () => {
 
     const questions = await loadQuestionSet(selectedQuestionSet);
     if (!questions) {
-      alert("❌ Failed to load question set!");
+      alert(" Failed to load question set!");
       return;
     }
 
@@ -152,12 +153,12 @@ const AdminDashboard = () => {
       };
 
       await api.post(`/admin/bulk-add-users`, body);
-      alert("✅ Bulk upload successful!");
+      alert(" Bulk upload successful!");
       setExcelUsers([]);
       fetchUsers();
     } catch (err) {
       console.error("Error uploading users:", err);
-      alert("❌ Bulk upload failed!");
+      alert(" Bulk upload failed!");
     }
   };
 
@@ -314,11 +315,11 @@ const AdminDashboard = () => {
         description: newSetForm.desc,
         questions: parsedQuestions
       });
-      alert("✅ New Question Set Created!");
+      alert(" New Question Set Created!");
       setNewSetForm({ key: "", desc: "", jsonPayload: "" });
       fetchQuestionSets();
     } catch (err) {
-      alert("❌ Check your JSON format or Key names! Error: " + err.message);
+      alert(" Check your JSON format or Key names! Error: " + err.message);
     }
   };
 
@@ -334,9 +335,9 @@ const AdminDashboard = () => {
         set_key: selectedActionSet,
         questions: parsedQuestions
       });
-      alert("✅ Question set content replaced successfully!");
+      alert(" Question set content replaced successfully!");
     } catch (err) {
-      alert("❌ Invalid JSON input: " + err.message);
+      alert(" Invalid JSON input: " + err.message);
     }
   };
 
@@ -352,7 +353,7 @@ const AdminDashboard = () => {
       fetchQuestionSets();
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to complete deletion.");
+      alert(" Failed to complete deletion.");
     }
   };
 
@@ -447,74 +448,7 @@ const AdminDashboard = () => {
 
 
       {/* ====== QUESTION MANAGEMENT CONTROL SECTION ====== */}
-      <div className="bg-gray-800 p-6 rounded-lg mb-10 max-w-4xl mx-auto shadow-lg grid grid-cols-1 md:grid-cols-2 gap-8 border border-gray-700">
-
-        {/* Create Column */}
-        <div>
-          <h2 className="text-xl mb-4 font-semibold text-cyan-400">Create New Question Set</h2>
-          <form onSubmit={handleCreateQSet} className="flex flex-col gap-3 text-black">
-            <input
-              type="text"
-              placeholder="Set Key (e.g., questionSet2)"
-              value={newSetForm.key}
-              onChange={(e) => setNewSetForm({ ...newSetForm, key: e.target.value })}
-              className="p-2 rounded bg-white text-black border"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Short Description"
-              value={newSetForm.desc}
-              onChange={(e) => setNewSetForm({ ...newSetForm, desc: e.target.value })}
-              className="p-2 rounded bg-white text-black border"
-            />
-            <textarea
-              placeholder='Paste array JSON data here: [{"language":"C","question_index":1,"title":"Name","buggy_code":"...","expected_output":"...","evaluation_answers":[]}]'
-              value={newSetForm.jsonPayload}
-              onChange={(e) => setNewSetForm({ ...newSetForm, jsonPayload: e.target.value })}
-              className="p-2 rounded font-mono text-xs h-32 bg-white text-black border"
-              required
-            />
-            <button className="bg-cyan-600 p-2 rounded text-white font-semibold hover:bg-cyan-700">
-              Deploy Question Set
-            </button>
-          </form>
-        </div>
-
-        {/* Manage / Delete / Replace Column */}
-        <div className="flex flex-col justify-between border-t md:border-t-0 md:border-l border-gray-700 pt-6 md:pt-0 md:pl-6">
-          <div>
-            <h2 className="text-xl mb-4 font-semibold text-red-400">Modify / Terminate Sets</h2>
-            <p className="text-sm text-gray-400 mb-3">Select a set from your backend system database to replace its source text array structure or safely wipe it entirely.</p>
-
-            <select
-              value={form.questionSet}
-              onChange={(e) => setForm({ ...form, questionSet: e.target.value })}
-              className="p-2 rounded"
-            >
-              <option value="">Select Question Set</option>
-              {availableSets.map((s) => (
-                <option key={s.id} value={s.set_key}>{s.set_key}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-3 mt-4">
-            <button
-              onClick={handleReplaceQSet}
-              className="bg-yellow-600 p-2 rounded text-white font-semibold hover:bg-yellow-700"
-            >
-              Replace Questions Content Payload
-            </button>
-            <button
-              onClick={handleDeleteQSet}
-              className="bg-red-600 p-2 rounded text-white font-semibold hover:bg-red-700"
-            >
-              Delete Set Permanently
-            </button>
-          </div>
-        </div>
-      </div>
+      <QuestionManager availableSets={availableSets} setAvailableSets={setAvailableSets} fetchQuestionSets={fetchQuestionSets} />
 
       {editModal && (
         <div
