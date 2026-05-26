@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
+import api from '../api/api';
 
 export default function QuestionManager({ availableSets, form, setForm, handleReplaceQSet, handleDeleteQSet }) {
-  // 1. Manage Set-level details
+  // --- UI State ---
+  const [activeTab, setActiveTab] = useState('create'); // 'create' | 'replace'
+
+  // --- Form State ---
   const [setKey, setSetKey] = useState('');
   const [setDesc, setSetDesc] = useState('');
-
-  // 2. Manage the dynamic array of questions
   const [questions, setQuestions] = useState([
     {
       language: 'C',
       title: '',
       buggy_code: '',
       expected_output: '',
-      evaluation_answers: '' // We will accept comma-separated strings and parse to JSON later
+      evaluation_answers: ''
     }
   ]);
 
-  // Handle changes for a specific question block
+  // --- Handlers ---
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
     setQuestions(updatedQuestions);
   };
 
-  // Add a new blank question to the form
   const addQuestionField = () => {
     setQuestions([
       ...questions,
@@ -31,57 +32,124 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     ]);
   };
 
-  // Remove a question from the form
   const removeQuestionField = (index) => {
     const updatedQuestions = questions.filter((_, i) => i !== index);
     setQuestions(updatedQuestions);
   };
 
-  // 3. Handle Form Submission
-  const handleCreateQSet = (e) => {
-    e.preventDefault();
-
-    // Transform the form data into the exact payload your backend expects
-    const finalPayload = questions.map((q, idx) => ({
+  const generatePayload = () => {
+    return questions.map((q, idx) => ({
       ...q,
-      question_index: idx + 1, // Auto-generate sequential index
-      // Safely split comma-separated strings into an array, trimming whitespace
-      evaluation_answers: q.evaluation_answers 
-        ? q.evaluation_answers.split(',').map(ans => ans.trim()) 
+      question_index: idx + 1,
+      evaluation_answers: q.evaluation_answers
+        ? q.evaluation_answers.split(',').map(ans => ans.trim())
         : []
     }));
+  };
 
+  const resetForm = () => {
+    setSetKey('');
+    setSetDesc('');
+    setQuestions([{ language: 'C', title: '', buggy_code: '', expected_output: '', evaluation_answers: '' }]);
+  };
+
+  // --- Submit Handlers ---
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
     const dataToSend = {
-      key: setKey,
-      desc: setDesc,
-      questions: finalPayload
+      set_key: setKey,
+      description: setDesc,
+      questions: generatePayload()
     };
 
     console.log("Submitting to backend:", dataToSend);
-    // TODO: Await your API call here
+    try {
+      const response = await api.post("/admin/create-qset", dataToSend);
+      console.log("Backend response:", response.message);
+      alert("Question set created successfully!");
+      resetForm();
+
+      if(fetchQuestionSets) fetchQuestionSets();
+    } catch (err) {
+      console.error("Error submitting question set:", err);
+      alert("Failed to create question set!");
+    }
+  };
+
+  const handleReplaceSubmit = async (e) => {
+    e.preventDefault();
+    if (!form?.questionSet) {
+      alert("Please select a question set to replace!");
+      return;
+    }
+
+    const dataToSend = {
+      set_key: form.questionSet,
+      questions: generatePayload()
+    };
+
+    // Assuming handleReplaceQSet in the parent can take this data as an argument,
+    // or you can fire your API call directly here just like in Create.
+    await handleReplaceQSet(dataToSend); 
+    resetForm();
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg mb-10 max-w-6xl mx-auto shadow-lg grid grid-cols-1 lg:grid-cols-3 gap-8 border border-gray-700">
       
-      {/* ====== CREATE COLUMN (Takes up more space now) ====== */}
+      {/* ====== MAIN COLUMN (Create or Replace Form) ====== */}
       <div className="lg:col-span-2">
-        <h2 className="text-xl mb-4 font-semibold text-cyan-400">Create New Question Set</h2>
         
-        <form onSubmit={handleCreateQSet} className="flex flex-col gap-6 text-black">
-          {/* Set Metadata */}
+        {/* View Toggles */}
+        <div className="flex gap-6 mb-6 border-b border-gray-600 pb-3">
+          <button
+            onClick={() => setActiveTab('create')}
+            className={`text-lg font-semibold transition-colors ${
+              activeTab === 'create' ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1' : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Create New Set
+          </button>
+          <button
+            onClick={() => setActiveTab('replace')}
+            className={`text-lg font-semibold transition-colors ${
+              activeTab === 'replace' ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Replace Existing Set
+          </button>
+        </div>
+        
+        <form onSubmit={activeTab === 'create' ? handleCreateSubmit : handleReplaceSubmit} className="flex flex-col gap-6 text-black">
+          
+          {/* Metadata Block depending on Mode */}
           <div className="flex gap-4">
+            {activeTab === 'create' ? (
+              <input
+                type="text"
+                placeholder="Set Key (e.g., questionSet2)"
+                value={setKey}
+                onChange={(e) => setSetKey(e.target.value)}
+                className="p-2 rounded bg-white text-black border w-1/3 focus:outline-none focus:border-cyan-500"
+                required
+              />
+            ) : (
+              <select
+                value={form?.questionSet || ''}
+                onChange={(e) => setForm({ ...form, questionSet: e.target.value })}
+                className="p-2 rounded bg-white text-black border w-1/3 focus:outline-none focus:border-yellow-500"
+                required
+              >
+                <option value="">Select Set to Replace...</option>
+                {availableSets?.map((s) => (
+                  <option key={s.id} value={s.set_key}>{s.set_key}</option>
+                ))}
+              </select>
+            )}
+            
             <input
               type="text"
-              placeholder="Set Key (e.g., questionSet2)"
-              value={setKey}
-              onChange={(e) => setSetKey(e.target.value)}
-              className="p-2 rounded bg-white text-black border w-1/3"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Short Description"
+              placeholder="Short Description (Optional)"
               value={setDesc}
               onChange={(e) => setSetDesc(e.target.value)}
               className="p-2 rounded bg-white text-black border flex-grow"
@@ -90,7 +158,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
 
           <hr className="border-gray-600" />
 
-          {/* Dynamic Questions Mapping */}
+          {/* Dynamic Questions Mapping (Shared across both modes) */}
           <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
             {questions.map((q, index) => (
               <div key={index} className="bg-gray-700 p-4 rounded-md border border-gray-600 relative">
@@ -167,18 +235,18 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
             
             <button 
               type="submit" 
-              className="bg-cyan-600 px-8 py-2 rounded text-white font-semibold hover:bg-cyan-700"
+              className={`${activeTab === 'create' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-yellow-600 hover:bg-yellow-700'} px-8 py-2 rounded text-white font-semibold`}
             >
-              Deploy Question Set
+              {activeTab === 'create' ? 'Deploy Question Set' : 'Overwrite Existing Set'}
             </button>
           </div>
         </form>
       </div>
 
-      {/* ====== MODIFY / DELETE COLUMN ====== */}
+      {/* ====== DELETE COLUMN (Simplified) ====== */}
       <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-gray-700 pt-6 lg:pt-0 lg:pl-6">
         <div>
-          <h2 className="text-xl mb-4 font-semibold text-red-400">Modify / Terminate Sets</h2>
+          <h2 className="text-xl mb-4 font-semibold text-red-400">Terminate Sets</h2>
           <p className="text-sm text-gray-400 mb-4">Select a set from your backend system database to safely wipe it entirely.</p>
           
           <select
@@ -186,7 +254,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
             onChange={(e) => setForm({ ...form, questionSet: e.target.value })}
             className="p-2 rounded w-full text-black mb-6"
           >
-            <option value="">Select Question Set...</option>
+            <option value="">Select Question Set to Delete</option>
             {availableSets?.map((s) => (
               <option key={s.id} value={s.set_key}>{s.set_key}</option>
             ))}
@@ -194,12 +262,6 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
         </div>
 
         <div className="flex flex-col gap-3 mt-auto">
-          <button
-            onClick={handleReplaceQSet}
-            className="bg-yellow-600 p-2 rounded text-white font-semibold hover:bg-yellow-700"
-          >
-            Replace Content Payload
-          </button>
           <button
             onClick={handleDeleteQSet}
             className="bg-red-600 p-2 rounded text-white font-semibold hover:bg-red-700"

@@ -24,7 +24,6 @@ const AdminDashboard = () => {
 
 
   const [availableSets, setAvailableSets] = useState([]);
-  const [newSetForm, setNewSetForm] = useState({ key: "", desc: "", jsonPayload: "" });
   const [selectedActionSet, setSelectedActionSet] = useState("");
 
   // Fetch available sets from DB
@@ -77,22 +76,17 @@ const AdminDashboard = () => {
       return;
     }
 
-    const questions = await loadQuestionSet(form.questionSet);
-    if (!questions) {
-      setMessage(" Failed to load questions!");
-      return;
-    }
-
+    // Backend expects question_set_key, NOT the loaded array of questions
     const body = {
       name: form.name,
       email: form.email,
-      questions,
+      question_set_key: form.questionSet,
       user_role: form.userRole ? "admin" : "user",
     };
 
     try {
       await api.post("/admin/add-user", body);
-      setMessage(" User added successfully!");
+      setMessage("User added successfully!");
       setForm({ name: "", email: "", questionSet: "", userRole: false });
       fetchUsers();
     } catch (err) {
@@ -128,17 +122,11 @@ const AdminDashboard = () => {
   // 🔹 Bulk upload users
   const handleBulkUpload = async () => {
     if (excelUsers.length === 0) {
-      alert("⚠️ No users loaded from Excel!");
+      alert("No users loaded from Excel!");
       return;
     }
     if (!selectedQuestionSet) {
-      alert("⚠️ Please select a question set first!");
-      return;
-    }
-
-    const questions = await loadQuestionSet(selectedQuestionSet);
-    if (!questions) {
-      alert(" Failed to load question set!");
+      alert("Please select a question set first!");
       return;
     }
 
@@ -147,18 +135,18 @@ const AdminDashboard = () => {
         users: excelUsers.map((u) => ({
           name: u.name,
           email: u.email,
-          questions,
           user_role: "user",
         })),
+        setId: selectedQuestionSet // Backend expects this ID
       };
 
       await api.post(`/admin/bulk-add-users`, body);
-      alert(" Bulk upload successful!");
+      alert("Bulk upload successful!");
       setExcelUsers([]);
       fetchUsers();
     } catch (err) {
       console.error("Error uploading users:", err);
-      alert(" Bulk upload failed!");
+      alert("Bulk upload failed!");
     }
   };
 
@@ -305,37 +293,14 @@ const AdminDashboard = () => {
   };
 
 
-  // Handle creating a new set from JSON
-  const handleCreateQSet = async (e) => {
-    e.preventDefault();
-    try {
-      const parsedQuestions = JSON.parse(newSetForm.jsonPayload);
-      await api.post("/admin/create-qset", {
-        set_key: newSetForm.key,
-        description: newSetForm.desc,
-        questions: parsedQuestions
-      });
-      alert(" New Question Set Created!");
-      setNewSetForm({ key: "", desc: "", jsonPayload: "" });
-      fetchQuestionSets();
-    } catch (err) {
-      alert(" Check your JSON format or Key names! Error: " + err.message);
-    }
-  };
-
   // Handle replacing existing data
-  const handleReplaceQSet = async () => {
-    if (!selectedActionSet) return alert("Select a target set first!");
-    const userJson = prompt("Paste your new questions JSON array here:");
-    if (!userJson) return;
+  const handleReplaceQSet = async (dataToSend) => {
+    if (!form.questionSet) return alert("Select a target set first!");
 
     try {
-      const parsedQuestions = JSON.parse(userJson);
-      await api.put("/admin/replace-qset", {
-        set_key: selectedActionSet,
-        questions: parsedQuestions
-      });
+      await api.put("/admin/replace-qset", dataToSend);
       alert(" Question set content replaced successfully!");
+      fetchQuestionSets();
     } catch (err) {
       alert(" Invalid JSON input: " + err.message);
     }
@@ -343,13 +308,13 @@ const AdminDashboard = () => {
 
   // Handle deleting the entire set structural instance
   const handleDeleteQSet = async () => {
-    if (!selectedActionSet) return alert("Select a target set first!");
-    if (!window.confirm(`Are you absolutely sure you want to delete ${selectedActionSet}? This will clear all linked user constraints.`)) return;
+    if (!form.questionSet) return alert("Select a target set first!");
+    if (!window.confirm(`Are you absolutely sure you want to delete ${form.questionSet}? This will clear all linked user constraints.`)) return;
 
     try {
-      await api.delete(`/admin/delete-qset/${selectedActionSet}`);
+      await api.delete(`/admin/delete-qset/${form.questionSet}`);
       alert("🗑️ Question Set Deleted!");
-      setSelectedActionSet("");
+      setForm({ ...form, questionSet: "" });
       fetchQuestionSets();
     } catch (err) {
       console.error(err);
@@ -387,13 +352,14 @@ const AdminDashboard = () => {
             className="p-2 rounded"
           />
           <select
-            value={form.questionSet}
+            value={form?.questionSet || ''}
             onChange={(e) => setForm({ ...form, questionSet: e.target.value })}
-            className="p-2 rounded"
+            className="p-2 rounded w-full text-black"
           >
             <option value="">Select Question Set</option>
-            <option value="questionSet1">Question Set 1</option>
-            {/* Add more sets when available */}
+            {availableSets?.map((s) => (
+              <option key={s.id} value={s.set_key}>{s.set_key}</option>
+            ))}
           </select>
           <div className="text-white flex items-center gap-2">
             <p>Admin:</p>
@@ -426,7 +392,9 @@ const AdminDashboard = () => {
           className="p-2 rounded mt-3 text-black w-full"
         >
           <option value="">Select Question Set</option>
-          <option value="questionSet1">Question Set 1</option>
+          {availableSets?.map((s) => (
+            <option key={s.id} value={s.id}>{s.set_key}</option>
+          ))}
         </select>
         <button
           onClick={handleBulkUpload}
@@ -448,7 +416,7 @@ const AdminDashboard = () => {
 
 
       {/* ====== QUESTION MANAGEMENT CONTROL SECTION ====== */}
-      <QuestionManager availableSets={availableSets} setAvailableSets={setAvailableSets} fetchQuestionSets={fetchQuestionSets} />
+      <QuestionManager availableSets={availableSets} setAvailableSets={setAvailableSets} fetchQuestionSets={fetchQuestionSets} form={form} setForm={setForm} handleReplaceQSet={handleReplaceQSet} handleDeleteQSet={handleDeleteQSet} />
 
       {editModal && (
         <div

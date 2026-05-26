@@ -89,26 +89,38 @@ app.post("/api/test", async (req, res) => {
 
     try {
         if (!email && !preferred_lang) return res.status(500).json({ message: "Credentials Missing" });
+        
         const query = `
             UPDATE test_users
             SET preferred_lang = $1,
                 is_participate = $3
             WHERE email = $2
             RETURNING id, email, password, preferred_lang, total_marks,
-                    is_participate, is_tab_change, is_end,
-                    is_fullscreen_out, time, is_finish;
-            `;
-
+                      is_participate, is_tab_change, is_end,
+                      is_fullscreen_out, time, is_finish, assigned_set_id; 
+        `;
 
         const updateResult = await pool.query(query, [preferred_lang, email, is_participate]);
+        
+        if (updateResult.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-        // Inside your backend index.js /api/test endpoint:
+        const user = updateResult.rows[0]; // Fix: Define user
+
+        // Fix: Define the actual query string to fetch questions
+        const questionQuery = `
+            SELECT * FROM test_questions 
+            WHERE set_id = $1 AND language = $2
+            ORDER BY question_index ASC;
+        `;
+        
         const questionsResult = await pool.query(questionQuery, [user.assigned_set_id, preferred_lang]);
 
         res.json({
             success: true,
-            questions: questionsResult.rows, // Clean, predictable array of data
-            userConfig: updateResult.rows[0]
+            questions: questionsResult.rows, 
+            userConfig: user
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
