@@ -14,30 +14,42 @@ export default function TestLaunch() {
   const setParticipate = useUserStore((state) => state.setParticipate);
   const setAttended = useUserStore((state) => state.setAttended);
   const Participate = useUserStore((state) => state.isParticipate);
+  const rawStartTime = useUserStore((state) => state.startTime);
+  const rawEndTime = useUserStore((state) => state.endTime);
+  
+
   const [showWarning, setShowWarning] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isParticipate, setIsParticipate] = useState(false);
 
-  const testStartTime = new Date("2025-10-08T17:00:00");
-  const testEndTime = new Date("2025-10-15T20:00:00");
+  // const testStartTime = new Date("2025-10-08T17:00:00");
+  // const testEndTime = new Date("2025-10-15T20:00:00");
   const [timeLeft, setTimeLeft] = useState(() => {
+    if (!rawStartTime || !rawEndTime) return 0;
     const now = new Date();
-    if (now < testStartTime) return 0;
-    return Math.max(0, Math.floor((testEndTime - now) / 1000));
+    const start = new Date(rawStartTime);
+    const end = new Date(rawEndTime);
+
+    if (now < start || now > end) return 0;
+    return Math.max(0, Math.floor((end - now) / 1000));
   });
 
   useEffect(() => {
+    if (!rawStartTime || !rawEndTime) return;
+    const start = new Date(rawStartTime);
+    const end = new Date(rawEndTime);
+
     const timer = setInterval(() => {
       const now = new Date();
-      if (now < testStartTime || now > testEndTime) {
+      if (now < start || now > end) {
         setTimeLeft(0);
         clearInterval(timer);
       } else {
-        setTimeLeft(Math.floor((testEndTime - now) / 1000));
+        setTimeLeft(Math.floor((end - now) / 1000));
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [testStartTime, testEndTime]);
+  }, [rawStartTime, rawEndTime]);
 
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600);
@@ -144,15 +156,28 @@ export default function TestLaunch() {
               </div>
             </div>
 
-            {timeLeft > 0 ? (timeLeft > 0 && timeLeft < 10800) && (
-              <div className="bg-cyan-700/30 text-white px-3 py-1 rounded-md font-semibold text-sm sm:text-base shadow-md">
-                Test Portal closes in {formatTime(timeLeft)}
-              </div>
-            ) : (
-              <div className="mt-4 bg-red-700/30 text-red-400 px-3 py-1 rounded-md font-semibold text-sm shadow-md">
-                Test Portal is closed
-              </div>
-            )}
+            {(() => {
+              if (!rawStartTime || !rawEndTime) {
+                return <div className="mt-4 bg-red-700/30 text-red-400 px-3 py-1 rounded-md font-semibold text-sm shadow-md">Test schedule unavailable</div>;
+              }
+
+              const now = new Date();
+              const start = new Date(rawStartTime);
+
+              if (now < start) {
+                return <div className="mt-4 bg-yellow-700/30 text-yellow-400 px-3 py-1 rounded-md font-semibold text-sm shadow-md">Test Portal has not started yet</div>;
+              }
+
+              if (timeLeft > 0) {
+                return (
+                  <div className="mt-4 bg-cyan-700/30 text-white px-3 py-1 rounded-md font-semibold text-sm sm:text-base shadow-md">
+                    Test Portal closes in {formatTime(timeLeft)}
+                  </div>
+                );
+              }
+
+              return <div className="mt-4 bg-red-700/30 text-red-400 px-3 py-1 rounded-md font-semibold text-sm shadow-md">Test Portal is closed</div>;
+            })()}
           </div>
 
           {showWarning && (

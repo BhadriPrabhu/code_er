@@ -13,7 +13,10 @@ test_users (
     time VARCHAR(8) DEFAULT '00:00:00',
     is_finish BOOLEAN DEFAULT FALSE,
     user_role VARCHAR(10) DEFAULT 'user',
+    start_time TIMESTAMPTZ, -- Added Start Time
+    end_time TIMESTAMPTZ,   -- Added End Time
     assigned_set_id INT REFERENCES question_sets(id)
+    allotted_duration INT DEFAULT '30',
 );
 
 
@@ -21,6 +24,8 @@ question_sets (
     id SERIAL PRIMARY KEY,
     set_key VARCHAR(50) UNIQUE NOT NULL, -- e.g., 'questionSet1', 'questionSet2'
     description TEXT,
+    start_time TIMESTAMPTZ, -- Added Start Time
+    end_time TIMESTAMPTZ,   -- Added End Time
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

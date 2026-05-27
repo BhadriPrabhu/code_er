@@ -12,6 +12,8 @@ export default function Login() {
   const setParticipate = useUserStore((state) => state.setParticipate);
   const setAttended = useUserStore((state) => state.setAttended)
   const setEmail = useUserStore((state) => state.setEmail);
+  const setStartTime = useUserStore((state) => state.setStartTime);
+  const setEndTime = useUserStore((state) => state.setEndTime);
 
   const [auth, setAuth] = useState({
     email: "",
@@ -37,6 +39,8 @@ export default function Login() {
         setPassword(auth.password);
         login(); // sets isAuth = true
         setAuth({ email: "", password: "" });
+        setStartTime(res.data.start_time);
+        setEndTime(res.data.end_time);
 
         // Navigate based on role
         if (role === "admin") navigate("/admin");

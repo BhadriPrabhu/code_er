@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/api';
 
-export default function QuestionManager({ availableSets, form, setForm, handleReplaceQSet, handleDeleteQSet }) {
+export default function QuestionManager({ availableSets, form, setForm, handleReplaceQSet, handleDeleteQSet, fetchQuestionSets }) {
   // --- UI State ---
   const [activeTab, setActiveTab] = useState('create'); // 'create' | 'replace'
 
@@ -51,6 +51,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     setSetKey('');
     setSetDesc('');
     setQuestions([{ language: 'C', title: '', buggy_code: '', expected_output: '', evaluation_answers: '' }]);
+    setForm({ ...form, questionSet: '', startTime: '', endTime: '' });
   };
 
   // --- Submit Handlers ---
@@ -59,7 +60,9 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     const dataToSend = {
       set_key: setKey,
       description: setDesc,
-      questions: generatePayload()
+      questions: generatePayload(),
+      start_time: form.startTime || "",
+      end_time: form.endTime || ""
     };
 
     console.log("Submitting to backend:", dataToSend);
@@ -85,7 +88,9 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
 
     const dataToSend = {
       set_key: form.questionSet,
-      questions: generatePayload()
+      questions: generatePayload(),
+      start_time: form.startTime || "",
+      end_time: form.endTime || ""
     };
 
     // Assuming handleReplaceQSet in the parent can take this data as an argument,
@@ -154,6 +159,26 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
               onChange={(e) => setSetDesc(e.target.value)}
               className="p-2 rounded bg-white text-black border flex-grow"
             />
+          </div>
+          <div className="flex gap-3 w-full">
+            <div className="w-1/2 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">Start Time</label>
+              <input
+                type="datetime-local"
+                value={form.startTime || ""}
+                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                className="p-2 rounded text-black"
+              />
+            </div>
+            <div className="w-1/2 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">End Time</label>
+              <input
+                type="datetime-local"
+                value={form.endTime || ""}
+                onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                className="p-2 rounded text-black"
+              />
+            </div>
           </div>
 
           <hr className="border-gray-600" />

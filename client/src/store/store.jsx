@@ -18,6 +18,8 @@ const useUserStore = create(
       password: '',
       isParticipate: false,
       isAttended: false,
+      startTime: "",
+      endTime: "",
       
       // NEW
       isAuth: false,
@@ -36,6 +38,8 @@ const useUserStore = create(
       setPassword: (value) => set({ password: value }),
       setParticipate: (value) => set({ isParticipate: value }),
       setAttended: (value) => set({ isAttended: value }),
+      setStartTime: (value) => set({ startTime: value }),
+      setEndTime: (value) => set({ endTime: value }),
 
       // NEW
       login: () => set({ isAuth: true }),
@@ -64,6 +68,8 @@ const useUserStore = create(
         password: state.password,
         isParticipate: state.isParticipate,
         isAttended: state.isAttended,
+        startTime: state.startTime,
+        endTime: state.endTime,
       }),
     }
   )

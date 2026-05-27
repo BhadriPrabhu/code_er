@@ -74,7 +74,9 @@ app.post("/api/login", async (req, res) => {
 
         res.json({ 
             message: "Login successful", 
-            role: item.user_role, 
+            role: item.user_role,
+            start_time: item.start_time,
+            end_time: item.end_time,
             isParticipate: hasAttended // Sends combined lock down status to client
         });
     } catch (err) {
@@ -97,7 +99,7 @@ app.post("/api/test", async (req, res) => {
             WHERE email = $2
             RETURNING id, email, password, preferred_lang, total_marks,
                       is_participate, is_tab_change, is_end,
-                      is_fullscreen_out, time, is_finish, assigned_set_id; 
+                      is_fullscreen_out, time, is_finish, assigned_set_id, start_time, end_time; 
         `;
 
         const updateResult = await pool.query(query, [preferred_lang, email, is_participate]);
@@ -235,7 +237,7 @@ app.get("/admin/users", async (req, res) => {
 
 // POST add a new user
 app.post("/admin/add-user", async (req, res) => {
-    const { name, email, question_set_key, user_role } = req.body;
+    const { name, email, question_set_key, user_role, start_time, end_time } = req.body;
 
     try {
         // Find the database ID mapping to the selected string (e.g. 'questionSet1')
@@ -245,10 +247,10 @@ app.post("/admin/add-user", async (req, res) => {
         const setId = setQuery.rows[0].id;
 
         const result = await pool.query(
-            `INSERT INTO test_users (password, email, assigned_set_id, user_role, total_marks, time)
-             VALUES ($1, $2, $3, $4, 0, '00:00:00')
+            `INSERT INTO test_users (password, email, assigned_set_id, user_role, start_time, end_time, total_marks, time)
+             VALUES ($1, $2, $3, $4, $5, $6, 0, '00:00:00')
              RETURNING id, email`,
-            [name, email, setId, user_role]
+            [name, email, setId, user_role, start_time, end_time]
         );
 
         res.status(201).json({ message: "User added successfully", user: result.rows[0] });
@@ -358,7 +360,7 @@ app.get("/admin/user-download", async (req, res) => {
 
 // 🔹 CREATE a new Question Set with its initial questions
 app.post("/admin/create-qset", async (req, res) => {
-    const { set_key, description, questions } = req.body;
+    const { set_key, description, questions, start_time, end_time } = req.body;
     // Expects questions to be an array: [{ language, question_index, title, buggy_code, expected_output, evaluation_answers }, ...]
 
     const client = await pool.connect();
@@ -367,8 +369,8 @@ app.post("/admin/create-qset", async (req, res) => {
 
         // 1. Insert into question_sets
         const setRes = await client.query(
-            "INSERT INTO question_sets (set_key, description) VALUES ($1, $2) RETURNING id",
-            [set_key, description]
+            "INSERT INTO question_sets (set_key, description, start_time, end_time) VALUES ($1, $2, $3, $4) RETURNING id",
+            [set_key, description, start_time, end_time]
         );
         const setId = setRes.rows[0].id;
 
@@ -417,7 +419,7 @@ app.delete("/admin/delete-qset/:set_key", async (req, res) => {
 
 // 🔹 REPLACE/UPDATE all questions inside an existing set
 app.put("/admin/replace-qset", async (req, res) => {
-    const { set_key, questions } = req.body;
+    const { set_key, questions, start_time, end_time } = req.body;
 
     const client = await pool.connect();
     try {
@@ -461,7 +463,7 @@ app.put("/admin/replace-qset", async (req, res) => {
 // 🔹 GET a list of all question sets (Used to populate your UI select options dynamically)
 app.get("/admin/qsets", async (req, res) => {
     try {
-        const result = await pool.query("SELECT id, set_key, description FROM question_sets ORDER BY created_at DESC");
+        const result = await pool.query("SELECT id, set_key, description, start_time, end_time FROM question_sets ORDER BY created_at DESC");
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -6,7 +6,7 @@ import QuestionManager from "../components/questionManager";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", questionSet: "", userRole: false });
+  const [form, setForm] = useState({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "" });
   const [message, setMessage] = useState("");
   const [excelUsers, setExcelUsers] = useState([]);
   const [selectedQuestionSet, setSelectedQuestionSet] = useState("");
@@ -52,9 +52,6 @@ const AdminDashboard = () => {
   }, []);
 
 
-
-
-
   // Load question set dynamically
   const loadQuestionSet = async (setName) => {
     const loader = questionSetMap[setName];
@@ -82,12 +79,14 @@ const AdminDashboard = () => {
       email: form.email,
       question_set_key: form.questionSet,
       user_role: form.userRole ? "admin" : "user",
+      start_time: form.startTime || "", // Added to payload
+      end_time: form.endTime || "",     // Added to payload
     };
 
     try {
       await api.post("/admin/add-user", body);
       setMessage("User added successfully!");
-      setForm({ name: "", email: "", questionSet: "", userRole: false });
+      setForm({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "" });
       fetchUsers();
     } catch (err) {
       console.error("Error adding user:", err);
@@ -313,13 +312,22 @@ const AdminDashboard = () => {
 
     try {
       await api.delete(`/admin/delete-qset/${form.questionSet}`);
-      alert("🗑️ Question Set Deleted!");
+      alert("Question Set Deleted!");
       setForm({ ...form, questionSet: "" });
       fetchQuestionSets();
     } catch (err) {
       console.error(err);
       alert(" Failed to complete deletion.");
     }
+  };
+
+  // Helper to format DB timestamps to datetime-local format
+  const formatDateTimeForInput = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    // Adjust for local timezone offset
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date - offset).toISOString().slice(0, 16);
   };
 
 
@@ -352,15 +360,50 @@ const AdminDashboard = () => {
             className="p-2 rounded"
           />
           <select
-            value={form?.questionSet || ''}
-            onChange={(e) => setForm({ ...form, questionSet: e.target.value })}
+            value={form.questionSet}
+            onChange={(e) => {
+              const selected = availableSets.find((s) => s.set_key === e.target.value);
+              if (selected) {
+                setForm({
+                  ...form,
+                  questionSet: selected.set_key,
+                  startTime: formatDateTimeForInput(selected.start_time),
+                  endTime: formatDateTimeForInput(selected.end_time)
+                });
+                console.log("Selected Set:", selected.set_key, "Start:", formatDateTimeForInput(selected.start_time) || null, "End:", formatDateTimeForInput(selected.end_time) || null);
+              } else {
+                setForm({ ...form, questionSet: "", startTime: "", endTime: "" });
+              }
+            }}
             className="p-2 rounded w-full text-black"
           >
             <option value="">Select Question Set</option>
             {availableSets?.map((s) => (
-              <option key={s.id} value={s.set_key}>{s.set_key}</option>
+              <option key={s.id} value={s.set_key}>
+                {s.set_key}
+              </option>
             ))}
           </select>
+          <div className="flex gap-3 w-full">
+            <div className="w-1/2 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">Start Time Override</label>
+              <input
+                type="datetime-local"
+                value={form.startTime}
+                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                className="p-2 rounded text-black"
+              />
+            </div>
+            <div className="w-1/2 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">End Time Override</label>
+              <input
+                type="datetime-local"
+                value={form.endTime}
+                onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                className="p-2 rounded text-black"
+              />
+            </div>
+          </div>
           <div className="text-white flex items-center gap-2">
             <p>Admin:</p>
             <input
