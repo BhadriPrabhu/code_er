@@ -6,7 +6,7 @@ import QuestionManager from "../components/questionManager";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "" });
+  const [form, setForm] = useState({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "", allottedDuration: "" });
   const [message, setMessage] = useState("");
   const [excelUsers, setExcelUsers] = useState([]);
   const [selectedQuestionSet, setSelectedQuestionSet] = useState("");
@@ -81,12 +81,13 @@ const AdminDashboard = () => {
       user_role: form.userRole ? "admin" : "user",
       start_time: form.startTime || "", // Added to payload
       end_time: form.endTime || "",     // Added to payload
+      allotted_duration: form.allottedDuration || "", // Added to payload
     };
 
     try {
       await api.post("/admin/add-user", body);
       setMessage("User added successfully!");
-      setForm({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "" });
+      setForm({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "", allottedDuration: "" });
       fetchUsers();
     } catch (err) {
       console.error("Error adding user:", err);
@@ -368,11 +369,11 @@ const AdminDashboard = () => {
                   ...form,
                   questionSet: selected.set_key,
                   startTime: formatDateTimeForInput(selected.start_time),
-                  endTime: formatDateTimeForInput(selected.end_time)
+                  endTime: formatDateTimeForInput(selected.end_time),
+                  allottedDuration: selected.allotted_duration || "",
                 });
-                console.log("Selected Set:", selected.set_key, "Start:", formatDateTimeForInput(selected.start_time) || null, "End:", formatDateTimeForInput(selected.end_time) || null);
               } else {
-                setForm({ ...form, questionSet: "", startTime: "", endTime: "" });
+                setForm({ ...form, questionSet: "", startTime: "", endTime: "", allottedDuration: "" });
               }
             }}
             className="p-2 rounded w-full text-black"
@@ -385,22 +386,32 @@ const AdminDashboard = () => {
             ))}
           </select>
           <div className="flex gap-3 w-full">
-            <div className="w-1/2 flex flex-col">
+            <div className="w-1/3 flex flex-col">
               <label className="text-xs text-gray-300 mb-1">Start Time Override</label>
               <input
                 type="datetime-local"
                 value={form.startTime}
                 onChange={(e) => setForm({ ...form, startTime: e.target.value })}
-                className="p-2 rounded text-black"
+                className="p-2 rounded w-full bg-white text-black"
               />
             </div>
-            <div className="w-1/2 flex flex-col">
+            <div className="w-1/3 flex flex-col">
               <label className="text-xs text-gray-300 mb-1">End Time Override</label>
               <input
                 type="datetime-local"
                 value={form.endTime}
                 onChange={(e) => setForm({ ...form, endTime: e.target.value })}
-                className="p-2 rounded text-black"
+                className="p-2 rounded w-full bg-white text-black"
+              />
+            </div>
+            <div className="w-1/3 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">Duration Override (mins)</label>
+              <input
+                type="number"
+                placeholder="e.g., 60"
+                value={form.allottedDuration}
+                onChange={(e) => setForm({ ...form, allottedDuration: e.target.value })}
+                className="p-2 rounded w-full bg-white text-black"
               />
             </div>
           </div>

@@ -18,6 +18,8 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     }
   ]);
 
+  const [allottedDuration, setAllottedDuration] = useState('');
+
   // --- Handlers ---
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
@@ -52,6 +54,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     setSetDesc('');
     setQuestions([{ language: 'C', title: '', buggy_code: '', expected_output: '', evaluation_answers: '' }]);
     setForm({ ...form, questionSet: '', startTime: '', endTime: '' });
+    setAllottedDuration('');
   };
 
   // --- Submit Handlers ---
@@ -62,7 +65,8 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       description: setDesc,
       questions: generatePayload(),
       start_time: form.startTime || "",
-      end_time: form.endTime || ""
+      end_time: form.endTime || "",
+      allotted_duration: allottedDuration || ""
     };
 
     console.log("Submitting to backend:", dataToSend);
@@ -72,7 +76,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       alert("Question set created successfully!");
       resetForm();
 
-      if(fetchQuestionSets) fetchQuestionSets();
+      if (fetchQuestionSets) fetchQuestionSets();
     } catch (err) {
       console.error("Error submitting question set:", err);
       alert("Failed to create question set!");
@@ -90,43 +94,42 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       set_key: form.questionSet,
       questions: generatePayload(),
       start_time: form.startTime || "",
-      end_time: form.endTime || ""
+      end_time: form.endTime || "",
+      allotted_duration: allottedDuration || ""
     };
 
     // Assuming handleReplaceQSet in the parent can take this data as an argument,
     // or you can fire your API call directly here just like in Create.
-    await handleReplaceQSet(dataToSend); 
+    await handleReplaceQSet(dataToSend);
     resetForm();
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg mb-10 max-w-6xl mx-auto shadow-lg grid grid-cols-1 lg:grid-cols-3 gap-8 border border-gray-700">
-      
+
       {/* ====== MAIN COLUMN (Create or Replace Form) ====== */}
       <div className="lg:col-span-2">
-        
+
         {/* View Toggles */}
         <div className="flex gap-6 mb-6 border-b border-gray-600 pb-3">
           <button
             onClick={() => setActiveTab('create')}
-            className={`text-lg font-semibold transition-colors ${
-              activeTab === 'create' ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1' : 'text-gray-400 hover:text-gray-300'
-            }`}
+            className={`text-lg font-semibold transition-colors ${activeTab === 'create' ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1' : 'text-gray-400 hover:text-gray-300'
+              }`}
           >
             Create New Set
           </button>
           <button
             onClick={() => setActiveTab('replace')}
-            className={`text-lg font-semibold transition-colors ${
-              activeTab === 'replace' ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : 'text-gray-400 hover:text-gray-300'
-            }`}
+            className={`text-lg font-semibold transition-colors ${activeTab === 'replace' ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : 'text-gray-400 hover:text-gray-300'
+              }`}
           >
             Replace Existing Set
           </button>
         </div>
-        
+
         <form onSubmit={activeTab === 'create' ? handleCreateSubmit : handleReplaceSubmit} className="flex flex-col gap-6 text-black">
-          
+
           {/* Metadata Block depending on Mode */}
           <div className="flex gap-4">
             {activeTab === 'create' ? (
@@ -151,7 +154,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
                 ))}
               </select>
             )}
-            
+
             <input
               type="text"
               placeholder="Short Description (Optional)"
@@ -161,7 +164,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
             />
           </div>
           <div className="flex gap-3 w-full">
-            <div className="w-1/2 flex flex-col">
+            <div className="w-1/3 flex flex-col">
               <label className="text-xs text-gray-300 mb-1">Start Time</label>
               <input
                 type="datetime-local"
@@ -170,13 +173,23 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
                 className="p-2 rounded text-black"
               />
             </div>
-            <div className="w-1/2 flex flex-col">
+            <div className="w-1/3 flex flex-col">
               <label className="text-xs text-gray-300 mb-1">End Time</label>
               <input
                 type="datetime-local"
                 value={form.endTime || ""}
                 onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                 className="p-2 rounded text-black"
+              />
+            </div>
+            <div className="w-1/3 flex flex-col">
+              <label className="text-xs text-gray-300 mb-1">Allotted Duration (mins)</label>
+              <input
+                type="number"
+                placeholder="e.g., 60"
+                value={allottedDuration}
+                onChange={(e) => setAllottedDuration(e.target.value)}
+                className="p-2 rounded bg-white text-black border focus:outline-none focus:border-cyan-500"
               />
             </div>
           </div>
@@ -190,8 +203,8 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
                 <h3 className="text-cyan-300 font-semibold mb-3 flex justify-between">
                   <span>Question {index + 1}</span>
                   {questions.length > 1 && (
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => removeQuestionField(index)}
                       className="text-red-400 text-sm hover:text-red-300"
                     >
@@ -210,7 +223,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
                     <option value="Python">Python</option>
                     <option value="JavaScript">JavaScript</option>
                   </select>
-                  
+
                   <input
                     type="text"
                     placeholder="Question Title (e.g., Pattern Printing)"
@@ -250,16 +263,16 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
           </div>
 
           <div className="flex gap-4 mt-2">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={addQuestionField}
               className="bg-gray-600 px-4 py-2 rounded text-white font-semibold hover:bg-gray-500 flex-grow"
             >
               + Add Another Question
             </button>
-            
-            <button 
-              type="submit" 
+
+            <button
+              type="submit"
               className={`${activeTab === 'create' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-yellow-600 hover:bg-yellow-700'} px-8 py-2 rounded text-white font-semibold`}
             >
               {activeTab === 'create' ? 'Deploy Question Set' : 'Overwrite Existing Set'}
@@ -273,7 +286,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
         <div>
           <h2 className="text-xl mb-4 font-semibold text-red-400">Terminate Sets</h2>
           <p className="text-sm text-gray-400 mb-4">Select a set from your backend system database to safely wipe it entirely.</p>
-          
+
           <select
             value={form?.questionSet || ''}
             onChange={(e) => setForm({ ...form, questionSet: e.target.value })}

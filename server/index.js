@@ -360,7 +360,7 @@ app.get("/admin/user-download", async (req, res) => {
 
 // 🔹 CREATE a new Question Set with its initial questions
 app.post("/admin/create-qset", async (req, res) => {
-    const { set_key, description, questions, start_time, end_time } = req.body;
+    const { set_key, description, questions, start_time, end_time, allotted_duration } = req.body;
     // Expects questions to be an array: [{ language, question_index, title, buggy_code, expected_output, evaluation_answers }, ...]
 
     const client = await pool.connect();
@@ -369,8 +369,8 @@ app.post("/admin/create-qset", async (req, res) => {
 
         // 1. Insert into question_sets
         const setRes = await client.query(
-            "INSERT INTO question_sets (set_key, description, start_time, end_time) VALUES ($1, $2, $3, $4) RETURNING id",
-            [set_key, description, start_time, end_time]
+            "INSERT INTO question_sets (set_key, description, start_time, end_time, allotted_duration) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+            [set_key, description, start_time, end_time, allotted_duration]
         );
         const setId = setRes.rows[0].id;
 
@@ -419,7 +419,7 @@ app.delete("/admin/delete-qset/:set_key", async (req, res) => {
 
 // 🔹 REPLACE/UPDATE all questions inside an existing set
 app.put("/admin/replace-qset", async (req, res) => {
-    const { set_key, questions, start_time, end_time } = req.body;
+    const { set_key, questions, start_time, end_time, allotted_duration } = req.body;
 
     const client = await pool.connect();
     try {
@@ -463,7 +463,7 @@ app.put("/admin/replace-qset", async (req, res) => {
 // 🔹 GET a list of all question sets (Used to populate your UI select options dynamically)
 app.get("/admin/qsets", async (req, res) => {
     try {
-        const result = await pool.query("SELECT id, set_key, description, start_time, end_time FROM question_sets ORDER BY created_at DESC");
+        const result = await pool.query("SELECT id, set_key, description, start_time, end_time, allotted_duration FROM question_sets ORDER BY created_at DESC");
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });

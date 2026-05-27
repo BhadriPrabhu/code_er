@@ -135,7 +135,7 @@ export default function TestLaunch() {
 
           <div className="bg-[#09132A] border border-cyan-500/20 rounded-lg p-5 mb-6">
             <h2 className="text-xl font-semibold text-cyan-300 mb-4">Test Info</h2>
-            <p><span className="text-gray-400">Duration:</span> <span className="text-white font-medium">30 mins (5 PM – 8 PM)</span></p>
+            <p><span className="text-gray-400">Duration:</span> <span className="text-white font-medium">30 mins</span></p>
             <p><span className="text-gray-400">Languages:</span> <span className="text-white font-medium">C / Python</span></p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
