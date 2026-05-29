@@ -14,7 +14,7 @@ export default function Login() {
   const setEmail = useUserStore((state) => state.setEmail);
   const setStartTime = useUserStore((state) => state.setStartTime);
   const setEndTime = useUserStore((state) => state.setEndTime);
-
+  const setAllottedDuration = useUserStore((state) => state.setAllottedDuration);
   const [auth, setAuth] = useState({
     email: "",
     password: ""
@@ -41,6 +41,7 @@ export default function Login() {
         setAuth({ email: "", password: "" });
         setStartTime(res.data.start_time);
         setEndTime(res.data.end_time);
+        setAllottedDuration(res.data.allotted_duration || 0);
 
         // Navigate based on role
         if (role === "admin") navigate("/admin");

@@ -20,6 +20,7 @@ const useUserStore = create(
       isAttended: false,
       startTime: "",
       endTime: "",
+      allottedDuration: 0,
       
       // NEW
       isAuth: false,
@@ -40,6 +41,7 @@ const useUserStore = create(
       setAttended: (value) => set({ isAttended: value }),
       setStartTime: (value) => set({ startTime: value }),
       setEndTime: (value) => set({ endTime: value }),
+      setAllottedDuration: (value) => set({ allottedDuration: value }),
 
       // NEW
       login: () => set({ isAuth: true }),
@@ -70,6 +72,7 @@ const useUserStore = create(
         isAttended: state.isAttended,
         startTime: state.startTime,
         endTime: state.endTime,
+        allottedDuration: state.allottedDuration,
       }),
     }
   )

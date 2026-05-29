@@ -77,6 +77,7 @@ app.post("/api/login", async (req, res) => {
             role: item.user_role,
             start_time: item.start_time,
             end_time: item.end_time,
+            allotted_duration: item.allotted_duration,
             isParticipate: hasAttended // Sends combined lock down status to client
         });
     } catch (err) {
@@ -99,7 +100,7 @@ app.post("/api/test", async (req, res) => {
             WHERE email = $2
             RETURNING id, email, password, preferred_lang, total_marks,
                       is_participate, is_tab_change, is_end,
-                      is_fullscreen_out, time, is_finish, assigned_set_id, start_time, end_time; 
+                      is_fullscreen_out, time, is_finish, assigned_set_id, start_time, end_time, allotted_duration; 
         `;
 
         const updateResult = await pool.query(query, [preferred_lang, email, is_participate]);
@@ -237,7 +238,7 @@ app.get("/admin/users", async (req, res) => {
 
 // POST add a new user
 app.post("/admin/add-user", async (req, res) => {
-    const { name, email, question_set_key, user_role, start_time, end_time } = req.body;
+    const { name, email, question_set_key, user_role, start_time, end_time, allotted_duration } = req.body;
 
     try {
         // Find the database ID mapping to the selected string (e.g. 'questionSet1')
@@ -247,10 +248,10 @@ app.post("/admin/add-user", async (req, res) => {
         const setId = setQuery.rows[0].id;
 
         const result = await pool.query(
-            `INSERT INTO test_users (password, email, assigned_set_id, user_role, start_time, end_time, total_marks, time)
-             VALUES ($1, $2, $3, $4, $5, $6, 0, '00:00:00')
+            `INSERT INTO test_users (password, email, assigned_set_id, user_role, start_time, end_time, allotted_duration, total_marks, time)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 0, '00:00:00')
              RETURNING id, email`,
-            [name, email, setId, user_role, start_time, end_time]
+            [name, email, setId, user_role, start_time, end_time, allotted_duration]
         );
 
         res.status(201).json({ message: "User added successfully", user: result.rows[0] });

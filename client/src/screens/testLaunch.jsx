@@ -16,6 +16,7 @@ export default function TestLaunch() {
   const Participate = useUserStore((state) => state.isParticipate);
   const rawStartTime = useUserStore((state) => state.startTime);
   const rawEndTime = useUserStore((state) => state.endTime);
+  const allottedDuration = useUserStore((state) => state.allottedDuration);
   
 
   const [showWarning, setShowWarning] = useState(true);
@@ -135,7 +136,7 @@ export default function TestLaunch() {
 
           <div className="bg-[#09132A] border border-cyan-500/20 rounded-lg p-5 mb-6">
             <h2 className="text-xl font-semibold text-cyan-300 mb-4">Test Info</h2>
-            <p><span className="text-gray-400">Duration:</span> <span className="text-white font-medium">30 mins</span></p>
+            <p><span className="text-gray-400">Duration:</span> <span className="text-white font-medium">{allottedDuration} mins</span></p>
             <p><span className="text-gray-400">Languages:</span> <span className="text-white font-medium">C / Python</span></p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
@@ -256,7 +257,7 @@ export default function TestLaunch() {
             <p className="text-gray-300 text-sm mb-4 leading-relaxed">
               Once you start, the screen will go fullscreen.
               Exiting fullscreen or switching tabs will <span className="text-red-400 font-semibold">end your test immediately</span>.
-              You have 30 minutes to complete the debugging questions.
+              You have {allottedDuration} minutes to complete the debugging questions.
             </p>
 
             <ul className="text-left list-disc text-sm text-gray-300 space-y-2 pl-5 mb-6">
