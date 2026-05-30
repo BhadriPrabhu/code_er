@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const logout = useUserStore((state) => state.logout);
   const setParticipate = useUserStore((state) => state.setParticipate);
   const setAttended = useUserStore((state) => state.setAttended);
+  const setPreferredLang = useUserStore((state) => state.setPreferredLang);
 
 
   const [availableSets, setAvailableSets] = useState([]);
@@ -201,6 +202,7 @@ const AdminDashboard = () => {
     logout();
     setParticipate(false);
     setAttended(false);
+    setPreferredLang("");
     window.location.href = "/";
   };
 
