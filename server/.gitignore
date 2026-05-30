@@ -6,3 +6,6 @@ node_modules
 dist
 dist-ssr
 *.local
+
+sample_data.txt
+admin_sample.txt
