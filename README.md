@@ -1,93 +1,75 @@
 # CODE ER
 
-A coding assessment platform built for live test-taking, leaderboard tracking, and admin management.
+A coding assessment platform for live test-taking, results tracking, and admin management.
 
 ## Overview
 
-CODE ER is a React + Vite frontend with an Express + PostgreSQL backend. It is designed for coding contests and student assessments, where users can:
-- log in
-- take coding tests
-- submit answers
-- view their performance
-- allow admins to manage participants and scores
+CODE ER is a full-stack assessment platform with a React + Vite frontend and an Express backend (PostgreSQL data store). It supports user login, timed coding tests, submissions, result tracking, and an admin dashboard for managing users and leaderboards.
 
-## Features
+## Tech stack
 
-- User login and role-based access
-- Coding test interface
-- Test submission and result tracking
-- Admin dashboard for viewing and managing users
-- Leaderboard and score management
-- Persistent client state for current user session
+- Frontend: React, Vite, Axios, Zustand
+- Styling: Tailwind CSS / plain CSS (project contains App.css / index.css)
+- Backend: Node.js, Express
+- Database: PostgreSQL (uses `pg`)
+- Dev tooling: npm, dotenv
 
-## Tech Stack
+## Repository structure
 
-### Frontend
-- React
-- Vite
-- Axios
-- Zustand
-- Tailwind CSS
+- `client/` — React application (Vite)
+	- `src/` — app source
+		- `api/` — API helper(s)
+		- `components/` — shared components
+		- `screens/` — pages (login, test, admin, etc.)
+		- `store/` — client state
+- `server/` — Express backend
+	- `controllers/` — route handlers
+	- `routes/` — route definitions
+	- `middleware/` — auth and helpers
+	- `config/` — DB config (`config/db.js`)
+	- `sample_data.txt`, `table.txt` — helper data files
 
-### Backend
-- Node.js
-- Express.js
-- PostgreSQL
-- dotenv
-- pg
+## Quickstart
 
-## Setup Instructions
+Requirements:
 
-### 2. Install dependencies
+- Node.js (>=16) and npm
+- PostgreSQL (local or remote)
 
-cd client  
+1. Install dependencies (client and server):
+
+```bash
+cd client
 npm install
 
-cd ../server  
+cd ../server
 npm install
+```
 
-### 3. Configure environment variables
+2. Configure environment variables (see next section).
 
-Create a .env file inside the server folder:
+3. Start the backend (from `server/`):
 
-PORT=5000  
-DATABASE_URL=postgresql://YOUR_DB_USER:YOUR_DB_PASSWORD@localhost:5432/YOUR_DB_NAME
-
-### 4. Start the backend
-
-cd server  
+```bash
+cd server
 npm start
+```
 
-### 5. Start the frontend
+4. Start the frontend (from `client/`):
 
-cd client  
+```bash
+cd client
 npm run dev
+```
 
-## Environment
+Open the frontend at the Vite dev URL (normally http://localhost:5173) and the API at the backend `PORT` (default 5000).
 
-- Frontend runs on Vite dev server
-- Backend runs on Express
-- PostgreSQL database required
+## Environment variables
 
-## Notes
+Create a `.env` file in `server/` with values similar to:
 
-- The current project stores user data in PostgreSQL.
-- Passwords should be hashed before production use.
-- CORS and authentication should be locked down before deployment.
-
-## Author
-
-**Bhadri Prabhu K**
-
-## License
-
-This project is currently for educational and internal use.
-
-## Future Improvements
-
-- Password hashing with bcrypt
-- JWT authentication
-- Secure admin authentication
-- Production-ready CORS settings
-- Docker support
-- Automated testing
+```
+PORT=5000
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/DATABASE_NAME
+JWT_SECRET=your_jwt_secret_here
+```
