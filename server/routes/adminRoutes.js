@@ -3,19 +3,21 @@ import { addUser, bulkAddUsers, createQuestionSet, deleteQuestionSet,
     deleteUser, getAllQuestionSets, getAllUsers, replaceQuestionSet, updateUser,
     userDetails, userDownload } from "../controllers/adminController.js";
 
+import { verifyAdmin } from "../middleware/authMiddleware.js";
+
 import Router from "express";
 const router = Router();
 
-router.get("/users", getAllUsers);
-router.post("/add-user", addUser);
-router.delete("/delete-user/:email", deleteUser);
-router.post("/user-details", userDetails);
-router.post("/bulk-add-users", bulkAddUsers);
-router.post("/update-user", updateUser);
-router.get("/user-download", userDownload);
-router.post("/create-qset", createQuestionSet);
-router.delete("/delete-qset/:set_key", deleteQuestionSet);
-router.get("/qsets", getAllQuestionSets);
-router.post("/replace-qset", replaceQuestionSet);
+router.get("/users",verifyAdmin, getAllUsers);
+router.post("/add-user", verifyAdmin, addUser);
+router.delete("/delete-user/:email", verifyAdmin, deleteUser);
+router.post("/user-details", verifyAdmin, userDetails);
+router.post("/bulk-add-users", verifyAdmin, bulkAddUsers);
+router.post("/update-user", verifyAdmin, updateUser);
+router.get("/user-download", verifyAdmin, userDownload);
+router.post("/create-qset", verifyAdmin, createQuestionSet);
+router.delete("/delete-qset/:set_key", verifyAdmin, deleteQuestionSet);
+router.get("/qsets", verifyAdmin, getAllQuestionSets);
+router.post("/replace-qset", verifyAdmin, replaceQuestionSet);
 
 export default router;

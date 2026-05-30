@@ -199,6 +199,7 @@ const AdminDashboard = () => {
   // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
+    localStorage.removeItem("token");
     logout();
     setParticipate(false);
     setAttended(false);

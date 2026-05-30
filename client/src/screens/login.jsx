@@ -30,7 +30,9 @@ export default function Login() {
     const body = { email: auth.email, password: auth.password };
     api.post("/api/login", body)
       .then((res) => {
-        // console.log(res)
+
+        localStorage.setItem("token", res.data.token);
+
         const role = res.data.role; // get role string
         setRole(role);
         const item = res.data.isParticipate;

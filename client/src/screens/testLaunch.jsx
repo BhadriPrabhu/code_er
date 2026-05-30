@@ -105,6 +105,7 @@ export default function TestLaunch() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
     logout();
     setIsParticipate(false);
     setAttended(false);
