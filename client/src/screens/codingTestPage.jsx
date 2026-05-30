@@ -40,7 +40,7 @@ export default function CodingTestPage() {
 
 
   useEffect(() => {
-    document.documentElement.requestFullscreen?.();
+    // document.documentElement.requestFullscreen?.();
 
     const handleTabSwitch = () => {
       if (isEndingRef.current) return;

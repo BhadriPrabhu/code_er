@@ -17,7 +17,7 @@ export default function TestLaunch() {
   const rawStartTime = useUserStore((state) => state.startTime);
   const rawEndTime = useUserStore((state) => state.endTime);
   const allottedDuration = useUserStore((state) => state.allottedDuration);
-  
+
 
   const [showWarning, setShowWarning] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -75,6 +75,15 @@ export default function TestLaunch() {
 
   const handleProceed = () => {
     setShowModal(false);
+
+    // Trigger fullscreen
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error("Failed to enter fullscreen:", err);
+      });
+    }
+
+    // API call to fetch questions and user config
     const body = {
       email: email,
       preferred_lang: preferredLang,
@@ -88,14 +97,6 @@ export default function TestLaunch() {
         setIsParticipate(!!item.is_participate);
         setParticipate(!!item.is_participate);
         navigate("/testpage");
-        // Trigger fullscreen
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch((err) => {
-            console.error("Failed to enter fullscreen:", err);
-          });
-        }
-
-
       })
       .catch((err) => {
         console.error("Error starting test:", err);
