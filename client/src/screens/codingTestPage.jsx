@@ -243,7 +243,7 @@ export default function CodingTestPage() {
             height="35vh"
             language={preferred_lang === "C" ? "c" : preferred_lang === "JavaScript" ? "javascript" : "python"}
             theme="vs-dark"
-            value={currentQuestion.question || endTest()}
+            value={currentQuestion.buggy_code || "// Loading code..."}
             options={{
               readOnly: true,
               minimap: { enabled: false },
