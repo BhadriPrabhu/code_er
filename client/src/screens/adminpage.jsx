@@ -9,13 +9,13 @@ const AdminDashboard = () => {
   const [form, setForm] = useState({ name: "", email: "", questionSet: "", userRole: false, startTime: "", endTime: "", allottedDuration: "" });
   const [message, setMessage] = useState("");
   const [excelUsers, setExcelUsers] = useState([]);
-  const [selectedQuestionSet, setSelectedQuestionSet] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [viewData, setViewData] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [editModal, setEditModal] = useState(false);
   const [editData, setEditData] = useState({ name: "", email: "", total_marks: 0 });
+  const [bulkForm, setBulkForm] = useState({ questionSet: "", startTime: "", endTime: "", allottedDuration: "" });
 
 
   const logout = useUserStore((state) => state.logout);
@@ -125,7 +125,7 @@ const AdminDashboard = () => {
       alert("No users loaded from Excel!");
       return;
     }
-    if (!selectedQuestionSet) {
+    if (!bulkForm.questionSet) {
       alert("Please select a question set first!");
       return;
     }
@@ -137,7 +137,10 @@ const AdminDashboard = () => {
           email: u.email,
           user_role: "user",
         })),
-        setId: selectedQuestionSet // Backend expects this ID
+        setId: bulkForm.questionSet,
+        start_time: bulkForm.startTime || "",
+        end_time: bulkForm.endTime || "",
+        allotted_duration: bulkForm.allottedDuration || "",
       };
 
       await api.post(`/admin/bulk-add-users`, body);
@@ -441,15 +444,58 @@ const AdminDashboard = () => {
           className="p-2 bg-gray-700 rounded text-white w-full"
         />
         <select
-          value={selectedQuestionSet}
-          onChange={(e) => setSelectedQuestionSet(e.target.value)}
+          value={bulkForm.questionSet}
+          onChange={(e) => {
+            const selected = availableSets.find((s) => s.set_key === e.target.value);
+            if (selected) {
+              setBulkForm({
+                ...bulkForm,
+                startTime: formatDateTimeForInput(selected.start_time),
+                endTime: formatDateTimeForInput(selected.end_time),
+                allottedDuration: selected.allotted_duration || "",
+                questionSet: selected.set_key,
+              });
+            } else {
+              setBulkForm({ ...bulkForm, questionSet: "", startTime: "", endTime: "", allottedDuration: "" });
+            }
+          }}
           className="p-2 rounded mt-3 text-black w-full"
         >
           <option value="">Select Question Set</option>
           {availableSets?.map((s) => (
-            <option key={s.id} value={s.id}>{s.set_key}</option>
+            <option key={s.id} value={s.set_key}>{s.set_key}</option>
           ))}
         </select>
+        <div className="flex gap-3 w-full">
+          <div className="w-1/3 flex flex-col">
+            <label className="text-xs text-gray-300 mb-1">Start Time Override</label>
+            <input
+              type="datetime-local"
+              value={bulkForm.startTime}
+              onChange={(e) => setBulkForm({ ...bulkForm, startTime: e.target.value })}
+              className="p-2 rounded w-full bg-white text-black"
+            />
+          </div>
+          <div className="w-1/3 flex flex-col">
+            <label className="text-xs text-gray-300 mb-1">End Time Override</label>
+            <input
+              type="datetime-local"
+              value={bulkForm.endTime}
+              onChange={(e) => setBulkForm({ ...bulkForm, endTime: e.target.value })}
+              className="p-2 rounded w-full bg-white text-black"
+            />
+          </div>
+          <div className="w-1/3 flex flex-col">
+            <label className="text-xs text-gray-300 mb-1">Duration Override (mins)</label>
+            <input
+              type="number"
+              placeholder="e.g., 60"
+              value={bulkForm.allottedDuration}
+              onChange={(e) => setBulkForm({ ...bulkForm, allottedDuration: e.target.value })}
+              className="p-2 rounded w-full bg-white text-black"
+            />
+          </div>
+        </div>
         <button
           onClick={handleBulkUpload}
           disabled={excelUsers.length === 0}

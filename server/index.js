@@ -296,7 +296,7 @@ app.post("/admin/user-details", async (req, res) => {
 
 app.post("/admin/bulk-add-users", async (req, res) => {
     // Note: The frontend must send 'setId' instead of a raw 'questions' array.
-    const { users, setId } = req.body; 
+    const { users, setId, start_time, end_time, allotted_duration } = req.body; 
 
     if (!users || !Array.isArray(users) || users.length === 0) {
         return res.status(400).json({ message: "No users provided" });
@@ -309,9 +309,9 @@ app.post("/admin/bulk-add-users", async (req, res) => {
 
             // Updated to use assigned_set_id instead of questions
             await pool.query(
-                `INSERT INTO test_users (password, email, assigned_set_id, user_role, total_marks, time)
-                 VALUES ($1, $2, $3, $4, 0, '00:00:00')`,
-                [name, email, setId, user_role]
+                `INSERT INTO test_users (password, email, assigned_set_id, user_role, total_marks, time, start_time, end_time, allotted_duration)
+                 VALUES ($1, $2, $3, $4, 0, '00:00:00', $5, $6, $7)`,
+                [name, email, setId, user_role, start_time || null, end_time || null, allotted_duration || null]
             );
         }
 
