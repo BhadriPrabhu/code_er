@@ -21,7 +21,8 @@ export default function Login() {
   });
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
     if(!auth.email || !auth.password){
       setError("Please enter both email and password.");
       return;
@@ -83,7 +84,7 @@ export default function Login() {
           <span className="tracking-wider">| BIT Student Branch</span>
         </div>
 
-        <div className="flex flex-col space-y-4 sm:space-y-5">
+        <form className="flex flex-col space-y-4 sm:space-y-5" onSubmit={handleLogin}>
           {error && (
             <div className="flex items-center bg-red-600/80 text-white text-sm sm:text-base px-3 py-2 rounded-md">
               <svg
@@ -128,13 +129,13 @@ export default function Login() {
           </div>
 
           <button
-            onClick={handleLogin}
+            type="submit"
             className="py-2.5 sm:py-3 rounded-md bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 font-semibold tracking-wide hover:scale-105 transition-all duration-300 text-sm sm:text-base"
             aria-label="Enter Debug Zone"
           >
             Enter Debug Zone
           </button>
-        </div>
+        </form>
 
         <p className="text-center text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6">
           <span className="text-cyan-400">#CodeWarriors</span> — Every bug is a challenge.
