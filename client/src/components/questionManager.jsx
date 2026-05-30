@@ -14,7 +14,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       title: '',
       buggy_code: '',
       expected_output: '',
-      evaluation_answers: ''
+      evaluation_answers: '' // Kept as string for the input field
     }
   ]);
 
@@ -44,7 +44,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       ...q,
       question_index: idx + 1,
       evaluation_answers: q.evaluation_answers
-        ? q.evaluation_answers.split(',').map(ans => ans.trim())
+        ? q.evaluation_answers.split(',').map(ans => ({ answer: ans.trim() }))
         : []
     }));
   };
@@ -57,9 +57,28 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
     setAllottedDuration('');
   };
 
+  // --- Validation Logic ---
+  const validateLanguages = () => {
+    const requiredLanguages = ["C", "Python", "JavaScript"];
+    const providedLanguages = questions.map(q => q.language);
+    
+    // Find which required languages are missing from the provided ones
+    const missingLanguages = requiredLanguages.filter(lang => !providedLanguages.includes(lang));
+
+    if (missingLanguages.length > 0) {
+      alert(`Validation Error: You must include at least one question for each language. Missing: ${missingLanguages.join(', ')}`);
+      return false; // Validation failed
+    }
+    return true; // Validation passed
+  };
+
   // --- Submit Handlers ---
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if all languages are present before submitting
+    if (!validateLanguages()) return; 
+
     const dataToSend = {
       set_key: setKey,
       description: setDesc,
@@ -69,10 +88,8 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       allotted_duration: allottedDuration || ""
     };
 
-    console.log("Submitting to backend:", dataToSend);
     try {
       const response = await api.post("/admin/create-qset", dataToSend);
-      console.log("Backend response:", response.message);
       alert("Question set created successfully!");
       resetForm();
 
@@ -90,6 +107,9 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       return;
     }
 
+    // Check if all languages are present before submitting
+    if (!validateLanguages()) return;
+
     const dataToSend = {
       set_key: form.questionSet,
       questions: generatePayload(),
@@ -98,10 +118,10 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
       allotted_duration: allottedDuration || ""
     };
 
-    // Assuming handleReplaceQSet in the parent can take this data as an argument,
-    // or you can fire your API call directly here just like in Create.
-    await handleReplaceQSet(dataToSend);
-    resetForm();
+    if(handleReplaceQSet) {
+      await handleReplaceQSet(dataToSend);
+      resetForm();
+    }
   };
 
   return (
@@ -163,6 +183,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
               className="p-2 rounded bg-white text-black border flex-grow"
             />
           </div>
+          
           <div className="flex gap-3 w-full">
             <div className="w-1/3 flex flex-col">
               <label className="text-xs text-gray-300 mb-1">Start Time</label>
@@ -183,7 +204,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
               />
             </div>
             <div className="w-1/3 flex flex-col">
-              <label className="text-xs text-gray-300 mb-1">Allotted Duration (mins)</label>
+              <label className="text-xs text-gray-300 mb-1">Duration (mins)</label>
               <input
                 type="number"
                 placeholder="e.g., 60"
@@ -196,7 +217,7 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
 
           <hr className="border-gray-600" />
 
-          {/* Dynamic Questions Mapping (Shared across both modes) */}
+          {/* Dynamic Questions Mapping */}
           <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
             {questions.map((q, index) => (
               <div key={index} className="bg-gray-700 p-4 rounded-md border border-gray-600 relative">
@@ -266,14 +287,14 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
             <button
               type="button"
               onClick={addQuestionField}
-              className="bg-gray-600 px-4 py-2 rounded text-white font-semibold hover:bg-gray-500 flex-grow"
+              className="bg-gray-600 px-4 py-2 rounded text-white font-semibold hover:bg-gray-500 flex-grow transition"
             >
               + Add Another Question
             </button>
 
             <button
               type="submit"
-              className={`${activeTab === 'create' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-yellow-600 hover:bg-yellow-700'} px-8 py-2 rounded text-white font-semibold`}
+              className={`${activeTab === 'create' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-yellow-600 hover:bg-yellow-700'} px-8 py-2 rounded text-white font-semibold transition`}
             >
               {activeTab === 'create' ? 'Deploy Question Set' : 'Overwrite Existing Set'}
             </button>
@@ -281,11 +302,11 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
         </form>
       </div>
 
-      {/* ====== DELETE COLUMN (Simplified) ====== */}
+      {/* ====== DELETE COLUMN ====== */}
       <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-gray-700 pt-6 lg:pt-0 lg:pl-6">
         <div>
           <h2 className="text-xl mb-4 font-semibold text-red-400">Terminate Sets</h2>
-          <p className="text-sm text-gray-400 mb-4">Select a set from your backend system database to safely wipe it entirely.</p>
+          <p className="text-sm text-gray-400 mb-4">Select a set from your backend database to safely wipe it entirely.</p>
 
           <select
             value={form?.questionSet || ''}
@@ -302,13 +323,12 @@ export default function QuestionManager({ availableSets, form, setForm, handleRe
         <div className="flex flex-col gap-3 mt-auto">
           <button
             onClick={handleDeleteQSet}
-            className="bg-red-600 p-2 rounded text-white font-semibold hover:bg-red-700"
+            className="bg-red-600 p-2 rounded text-white font-semibold hover:bg-red-700 transition"
           >
             Delete Set Permanently
           </button>
         </div>
       </div>
-
     </div>
   );
 }
