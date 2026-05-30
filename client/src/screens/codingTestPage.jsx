@@ -241,7 +241,7 @@ export default function CodingTestPage() {
 
           <MonacoEditor
             height="35vh"
-            language={preferred_lang === "C" ? "c" : "python"}
+            language={preferred_lang === "C" ? "c" : preferred_lang === "JavaScript" ? "javascript" : "python"}
             theme="vs-dark"
             value={currentQuestion.question || endTest()}
             options={{
@@ -293,7 +293,7 @@ export default function CodingTestPage() {
 
           <MonacoEditor
             height="65vh"
-            defaultLanguage={preferred_lang === "C" ? "c" : "python"}
+            defaultLanguage={preferred_lang === "C" ? "c" : preferred_lang === "JavaScript" ? "javascript" : "python"}
             theme="vs-dark"
             value={code}
             onChange={(v) => setCode(v)}

@@ -137,12 +137,12 @@ export default function TestLaunch() {
           <div className="bg-[#09132A] border border-cyan-500/20 rounded-lg p-5 mb-6">
             <h2 className="text-xl font-semibold text-cyan-300 mb-4">Test Info</h2>
             <p><span className="text-gray-400">Duration:</span> <span className="text-white font-medium">{allottedDuration} mins</span></p>
-            <p><span className="text-gray-400">Languages:</span> <span className="text-white font-medium">C / Python</span></p>
+            <p><span className="text-gray-400">Languages:</span> <span className="text-white font-medium">C / Python/ JavaScript</span></p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
               <span className="text-sm">Preferred Language:</span>
               <div className="flex gap-2">
-                {["C", "Python"].map((lang) => (
+                {["C", "Python", "JavaScript"].map((lang) => (
                   <button
                     key={lang}
                     onClick={() => setPreferredLang(lang)}
