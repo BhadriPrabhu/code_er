@@ -6,6 +6,15 @@ A coding assessment platform for live test-taking, results tracking, and admin m
 
 CODE ER is a full-stack assessment platform with a React + Vite frontend and an Express backend (PostgreSQL data store). It supports user login, timed coding tests, submissions, result tracking, and an admin dashboard for managing users and leaderboards.
 
+## Key Features
+
+*   **Anti-Cheat & Proctoring Engine:** Ensures assessment integrity by automatically detecting tab-switching and fullscreen exits, logging all monitoring events with precise timestamps.
+*   **Rich Coding Environment:** Integrated with the Monaco code editor (the engine behind VS Code), providing a professional test-taking interface with support for multiple programming languages.
+*   **Automated Evaluation & Leaderboards:** Automatically calculates scores based on expected outputs and generates dynamic, rank-sorted leaderboards to track performance history.
+*   **Bulk Admin Operations:** Simplifies user management by allowing administrators to seamlessly onboard test-takers in bulk via Excel/CSV uploads and download comprehensive performance reports.
+*   **Dynamic Assessment Control:** Gives admins granular control to assign specific question sets, set test duration constraints per user, and enforce strict start/end access windows.
+*   **Secure Role-Based Access:** Features a hardened JWT-based authentication system (with 12-hour expiry) ensuring strict separation between standard test-takers and administrative dashboards.
+
 ## Tech stack
 
 - Frontend: React, Vite, Axios, Zustand
