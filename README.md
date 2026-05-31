@@ -73,3 +73,7 @@ PORT=5000
 DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/DATABASE_NAME
 JWT_SECRET=your_jwt_secret_here
 ```
+
+## Author
+
+Originally created by Bhadri Prabhu K - https://github.com/BhadriPrabhu
