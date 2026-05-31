@@ -16,7 +16,9 @@ CODE ER is a full-stack assessment platform with a React + Vite frontend and an 
 *   **Secure Role-Based Access:** Features a hardened JWT-based authentication system (with 12-hour expiry) ensuring strict separation between standard test-takers and administrative dashboards.
 
 ## Tech stack
-
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 - Frontend: React, Vite, Axios, Zustand
 - Styling: Tailwind CSS / plain CSS (project contains App.css / index.css)
 - Backend: Node.js, Express
